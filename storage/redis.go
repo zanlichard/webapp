@@ -2,12 +2,12 @@ package storage
 
 import (
 	"encoding/json"
+	"github.com/zanlichard/redisgoe/redis"
 	"net"
 	"strings"
 	"time"
 	e "webapp/errors"
 	"webapp/stat"
-	"github.com/garyburd/redigo/redis"
 )
 
 const (
