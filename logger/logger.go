@@ -3,7 +3,7 @@ package logger
 import (
 	"fmt"
 
-	"github.com/astaxie/beego/logs"
+	"github.com/zanlichard/beegoe/logs"
 )
 
 var (

@@ -1,7 +1,7 @@
 package appinterface
 
 import (
-	"github.com/astaxie/beego/validation"
+	"github.com/zanlichard/beegoe/validation"
 )
 
 //检查APP版本
