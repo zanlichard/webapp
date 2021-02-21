@@ -1,0 +1,59 @@
+package errors
+
+type RetCode int32
+const (
+	RetCode_SUCCESS                 RetCode = 0
+	RetCode_ERR_BEGIN               RetCode = 51001001
+	RetCode_ERR_VERSION_OR_PF       RetCode = 51001002
+	RetCode_ERR_PARAM               RetCode = 51001003
+	RetCode_ERR_CREATE_SESS         RetCode = 51001004
+	RetCode_ERR_NO_SUCH_USER        RetCode = 51001005
+	RetCode_ERR_DEL_SESS            RetCode = 51001006
+	RetCode_ERR_TIMEOUT             RetCode = 51001007
+	RetCode_ERR_RATE_LIMIT_EXCCEED  RetCode = 51001008
+	RetCode_ERR_VERSION_TOO_OLD     RetCode = 51001009
+	RetCode_ERR_SERVER_INNER        RetCode = 51001010
+	RetCode_ERR_OVERLOAD            RetCode = 51001011
+	RetCode_ERR_CACHE_GET           RetCode = 51001012
+	RetCode_ERR_CACHE_MISS          RetCode = 51001013
+	RetCode_ERR_TYPE_ASSERT         RetCode = 5100014
+	RetCode_ERR_MARSH               RetCode = 51001015
+	RetCode_ERR_CACHE_SET           RetCode = 51001016
+	RetCode_ERR_CACHE_SETE          RetCode = 51001017
+	RetCode_ERR_CACHE_TTL           RetCode = 51001018
+	RetCode_ERR_CACHE_DEL           RetCode = 51001019
+	RetCode_ERR_US_ALREADY_EXIST    RetCode = 51001020
+	RetCode_ERR_US_NOT_EXIST        RetCode = 51001021
+	RetCode_ERR_DB_NOT_READY        RetCode = 51001030
+	RetCode_ERR_DB_SERVER           RetCode = 51001031
+	RetCode_ERR_UNAME_KEY_NOT_EXIST RetCode = 51001032
+	RetCode_ERR_FLOW_NOT_MATCH      RetCode = 51001033
+	RetCode_ERR_END                 RetCode = 51001999
+)
+
+var RetCode_name = map[int32]string{
+	0:        "SUCCESS",
+	51001001: "ERR_BEGIN",
+	51001002: "ERR_VERSION_OR_PF",
+	51001003: "ERR_PARAM",
+	51001004: "ERR_CREATE_SESS",
+	51001005: "ERR_NO_SUCH_USER",
+	51001006: "ERR_DEL_SESS",
+	51001007: "ERR_TIMEOUT",
+	51001008: "ERR_RATE_LIMIT_EXCCEED",
+	51001009: "ERR_VERSION_TOO_OLD",
+	51001010: "ERR_SERVER_INNER",
+	51001011: "ERR_OVERLOAD",
+	51001012: "ERR_CACHE_GET",
+	51001013: "ERR_CACHE_MISS",
+	51001014: "ERR_TYPE_ASSERT",
+	51001015: "ERR_MARSH",
+	51001016: "ERR_CACHE_SET",
+	51001017: "ERR_CACHE_SETE",
+	51001018: "ERR_CACHE_TTL",
+	51001019: "ERR_CACHE_DEL",
+	51001030: "ERR_DB_NOT_READY",
+	51001031: "ERR_DB_SERVER",
+	51001033: "ERR_FLOW_NOT_MATCH",
+	51001999: "ERR_END",
+}
