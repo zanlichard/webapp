@@ -1,8 +1,8 @@
 package appframeworkboot
 
 import (
-	"webapp/globalconfig"
 	"gitee.com/cristiane/go-common/log"
+	"webapp/globalconfig"
 )
 
 // SetupVars 加载变量
@@ -14,6 +14,11 @@ func SetupVars() error {
 	}
 
 	globalconfig.AccessLogger, err = log.GetAccessLogger("access")
+	if err != nil {
+		return err
+	}
+
+	globalconfig.BusinessLogger, err = log.GetBusinessLogger("business")
 	if err != nil {
 		return err
 	}

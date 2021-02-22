@@ -1,7 +1,6 @@
 package appframework
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,23 +23,16 @@ type WEBApplication struct {
 	*Application
 	EndPort        int
 	MonitorEndPort int
-	// 监控
-	Mux            *http.ServeMux
+
+	// 监控使用的http server
+	Mux *http.ServeMux
 	// RegisterHttpRoute 定义HTTP router
 	RegisterHttpRoute func() *gin.Engine
 	// 系统定时任务
 	RegisterTasks func() []CronTask
 }
 
-type ListenerApplication struct {
-	*Application
-	EndPort        int
-	MonitorEndPort int
-	Network        string
-	ReadTimeout    int
-	WriteTimeout   int
-	// 监控
-	Mux            *http.ServeMux
-	// Listener Server Accept 后的自定义事件
-	EventHandler func(context.Context,[]byte) ([]byte, error)
+type CronTask struct {
+	Cron     string
+	TaskFunc func()
 }

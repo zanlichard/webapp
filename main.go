@@ -1,17 +1,18 @@
 package main
 
 import (
-	"webapp/storage"
-	"webapp/apptoml"
-	"webapp/logger"
-	"webapp/stat"
-	"webapp/appengine"
-	"webapp/appframeworkboot"
-	"webapp/appframework"
 	"fmt"
 	"runtime"
 	"time"
+	"webapp/appengine"
+	"webapp/appframework"
+	"webapp/appframeworkboot"
+	"webapp/apptoml"
+	"webapp/logger"
+	"webapp/stat"
+	"webapp/storage"
 )
+
 const (
 	//Version 版本
 	Version = "010000"
@@ -19,7 +20,7 @@ const (
 	VersionEx = "1.0.0"
 	//Update 版本
 	Update = "2021-2-19 17:46:00"
-    //服务名
+	//服务名
 	AppName = "webapp"
 )
 
@@ -74,7 +75,6 @@ func initStat() {
 
 func exitStat() {
 	stat.Exit()
-
 }
 
 func main() {
@@ -88,22 +88,22 @@ func main() {
 
 	//存储初始化
 	serverAddr := apptoml.Config.Database.Mysql.ServerAddr
-	user       := apptoml.Config.Database.Mysql.User
-	pwd        := apptoml.Config.Database.Mysql.Passwd
-	dbase      := apptoml.Config.Database.Mysql.Database
-	maxOpen    := apptoml.Config.Database.Mysql.MaxOpenConns
-	maxIdle    := apptoml.Config.Database.Mysql.MaxIdleConns
-	idleTime   := apptoml.Config.Database.Mysql.IdleTimeout
-	storage.InitDB(serverAddr,user,pwd,dbase,maxOpen,maxIdle,idleTime)
+	user := apptoml.Config.Database.Mysql.User
+	pwd := apptoml.Config.Database.Mysql.Passwd
+	dbase := apptoml.Config.Database.Mysql.Database
+	maxOpen := apptoml.Config.Database.Mysql.MaxOpenConns
+	maxIdle := apptoml.Config.Database.Mysql.MaxIdleConns
+	idleTime := apptoml.Config.Database.Mysql.IdleTimeout
+	storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime)
 
 	//框架初始化
 	application := &appframework.WEBApplication{
 		Application: &appframework.Application{
-			Name:       AppName,
-			SetupVars:  appframeworkboot.SetupVars,
+			Name:      AppName,
+			SetupVars: appframeworkboot.SetupVars,
 		},
-		RegisterHttpRoute:appframeworkboot.RegisterHttpRoute,
-		RegisterTasks:appframeworkboot.RegisterTasks,
+		RegisterHttpRoute: appframeworkboot.RegisterHttpRoute,
+		RegisterTasks:     appframeworkboot.RegisterTasks,
 	}
 	appengine.RunApplication(application)
 

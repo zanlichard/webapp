@@ -2,8 +2,8 @@ package app
 
 import (
 	"errors"
-	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
+	"github.com/zanlichard/beegoe/validation"
 	"strings"
 )
 

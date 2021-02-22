@@ -1,11 +1,11 @@
 package app
 
 import (
-	"webapp/pkg/code"
-	"webapp/globalconfig"
 	"context"
-	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
+	"github.com/zanlichard/beegoe/validation"
+	"webapp/globalconfig"
+	"webapp/pkg/code"
 )
 
 func MarkErrors(ctx context.Context, errors []*validation.Error) {

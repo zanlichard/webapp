@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/astaxie/beego/logs"
+	"github.com/zanlichard/beegoe/logs"
 )
 
 const (

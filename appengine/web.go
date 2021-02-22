@@ -1,13 +1,13 @@
 package appengine
 
 import (
-	"webapp/appframework"
-	"webapp/apptoml"
-	. "webapp/logger"
-	"webapp/globalconfig"
 	"fmt"
 	"net/http"
 	"strconv"
+	"webapp/appframework"
+	"webapp/apptoml"
+	"webapp/globalconfig"
+	. "webapp/logger"
 )
 
 func RunApplication(application *appframework.WEBApplication) {
@@ -15,10 +15,10 @@ func RunApplication(application *appframework.WEBApplication) {
 		Logger.Error("Application name can't not be empty")
 	}
 
-	application.EndPort        = apptoml.Config.Server.EndPort
+	application.EndPort = apptoml.Config.Server.EndPort
 	application.LoggerRootPath = apptoml.Config.Server.Log.LogDir
-	application.Type           = appframework.AppTypeWeb
-	globalconfig.App              = application
+	application.Type = appframework.AppTypeWeb
+	globalconfig.App = application
 	err := runApp(application)
 	if err != nil {
 		Logger.Error("App.RunListenerApplication err: %v", err)
@@ -44,7 +44,7 @@ func runApp(webApp *appframework.WEBApplication) error {
 		}
 	}
 
-	//4.  setup server monitor
+	//3.  setup server monitor in single goroutine
 	go func() {
 		addr := "0.0.0.0:" + strconv.Itoa(webApp.MonitorEndPort)
 		Logger.Info("App run monitor server addr: %v", addr)

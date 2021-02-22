@@ -1,17 +1,16 @@
 package router
 
 import (
+	"github.com/gin-gonic/gin"
+	"io"
+	"os"
 	"webapp/apptoml"
 	"webapp/middleware"
 	v1 "webapp/router/api/v1"
 	"webapp/stat"
-	"github.com/gin-gonic/gin"
-	"io"
-	"os"
 )
 
-
-func initStat(){
+func initStat() {
 	stat.GStat.AddReportBodyRowItem(v1.StatGetAppVersion)
 	stat.GStat.AddReportErrorItem(v1.StatGetAppVersion)
 }
@@ -22,7 +21,7 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 
 	if apptoml.Config.Server.Debug {
 		gin.SetMode(gin.DebugMode)
-	}else{
+	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -34,9 +33,9 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 	apiG := r.Group("/api")
 	apiV1 := apiG.Group("/v1")
 	{
-		apiResources := apiV1.Group("/resources")
+		apiResources := apiV1.Group("/app")
 		{
-			apiResources.POST("/app/check_version", v1.CheckAppVersionApi)       
+			apiResources.POST("/check_version", v1.CheckAppVersionApi)
 		}
 	}
 	//初始化监控
