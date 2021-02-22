@@ -77,6 +77,33 @@ func exitStat() {
 	stat.Exit()
 }
 
+//从配置管理中心获取服务的自身配置和依赖的外部服务的配置
+func initServiceDep() bool {
+	acl := appframework.LocalAcl{
+		LocalServiceId:     "2160037",
+		CheckAlgorithm:     "md5",
+		CheckSignKey:       "h6F2GvOm1Q1pR5ATYbMjUIUyscLiBs3E",
+		AllowServiceIdList: []string{"2120013", "2160034"},
+		CheckIdField:       "HSB-OPENAPI-CALLERSERVICEID",
+		CheckSignField:     "HSB-OPENAPI-SIGNATURE",
+		CheckSignData:      []string{"_head", "_param"},
+	}
+	appframework.LocalServiceCfg = acl
+	/*
+		err := json.Unmarshal([]byte(localcfg), &appframework.LocalServiceCfg)
+		if err != nil {
+			logger.Logger.Error("Load service config failed for:%+v", err)
+			return false
+		}
+	*/
+	localServiceId := "2160037"
+	id2name := make(map[string]string)
+	id2name[localServiceId] = AppName
+	appframework.ServiceIdDependenceMap = id2name
+	return true
+
+}
+
 func main() {
 	//应用层初始化
 	initEnv()
@@ -85,6 +112,10 @@ func main() {
 	//本地化监控初始化
 	initStat()
 	defer exitStat()
+
+	if !initServiceDep() {
+		return
+	}
 
 	//存储初始化
 	serverAddr := apptoml.Config.Database.Mysql.ServerAddr

@@ -21,6 +21,7 @@ func RunApplication(application *appframework.WEBApplication) {
 	application.EndPort = apptoml.Config.Server.EndPort
 	application.LoggerRootPath = apptoml.Config.Server.Log.LogDir
 	application.Type = appframework.AppTypeWeb
+	application.MonitorEndPort = apptoml.Config.Server.MonitorEndPort
 
 	err := runApp(application)
 	if err != nil {
