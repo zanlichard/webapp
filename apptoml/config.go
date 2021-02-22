@@ -3,6 +3,7 @@ package apptoml
 import (
 	"fmt"
 	"os"
+
 	"github.com/BurntSushi/toml"
 )
 
@@ -16,33 +17,34 @@ var (
 
 type (
 	globalConfig struct {
-		Title           string          `toml:"title"`
-		Server          server          `toml:"server"`
-		Database        database        `toml:"database"`
-		Redisinfo       redisinfo       `toml:"redisinfo"`
-		RabbitMq        rabbitmq        `toml:"rabbitmq"`
+		Title     string    `toml:"title"`
+		Server    server    `toml:"server"`
+		Database  database  `toml:"database"`
+		Redisinfo redisinfo `toml:"redisinfo"`
+		RabbitMq  rabbitmq  `toml:"rabbitmq"`
+		ConfigMng cfgcenter `toml:"cfgcenter"`
 	}
 	rabbitmq struct {
-		Username        string          `toml:"username"`
-		Password        string          `toml:"password"`
-		ServerAddr      string          `toml:"server"`
-		ServerPort      int             `toml:"port"`
-		Vhost           string          `toml:"vhost"`
-		Queuename       string          `toml:"queue"`
-
+		Username   string `toml:"username"`
+		Password   string `toml:"password"`
+		ServerAddr string `toml:"server"`
+		ServerPort int    `toml:"port"`
+		Vhost      string `toml:"vhost"`
+		Queuename  string `toml:"queue"`
 	}
 
 	server struct {
-		Debug                    bool     `toml:"debug"`
-		Log                      log      `toml:"log"`
-		Stat                     stat     `toml:"stat"`
-		Network                  string   `toml:"listen"`
-		EndPort                  int      `toml:"port"`
-		MonitorEndPort           int      `toml:"monitorPort"`
-		ServerReadTimeout        int64    `toml:"serverReadTimeout"`
-		ServerWriteTimeout       int64    `toml:"serverWriteTimeout"`
-		FuncTimeThreshold        int64    `toml:"funcTimeThreshold"`
-		RequestProcTimeout       int64    `toml:"requestProcTimeout"`
+		Debug              bool   `toml:"debug"`
+		ServiceName        string `toml:"serviceName"`
+		Log                log    `toml:"log"`
+		Stat               stat   `toml:"stat"`
+		Network            string `toml:"listen"`
+		EndPort            int    `toml:"port"`
+		MonitorEndPort     int    `toml:"monitorPort"`
+		ServerReadTimeout  int64  `toml:"serverReadTimeout"`
+		ServerWriteTimeout int64  `toml:"serverWriteTimeout"`
+		FuncTimeThreshold  int64  `toml:"funcTimeThreshold"`
+		RequestProcTimeout int64  `toml:"requestProcTimeout"`
 	}
 
 	log struct {
@@ -75,7 +77,6 @@ type (
 		MysqlSlave mysql `toml:"mysqlslave"`
 	}
 
-
 	mysql struct {
 		ServerAddr   string `toml:"serveraddr"`
 		User         string `toml:"user"`
@@ -93,8 +94,11 @@ type (
 		MaxActive   int      `toml:"maxActive"`
 		IdleTimeout int      `toml:"idleTimeout"`
 	}
-)
 
+	cfgcenter struct {
+		MasterServerList []string `toml:"masterAddrList"`
+	}
+)
 
 func init() {
 	if configFile == "" {

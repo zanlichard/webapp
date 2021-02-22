@@ -6,8 +6,11 @@ import (
 	"strconv"
 	"webapp/appframework"
 	"webapp/apptoml"
-	"webapp/globalconfig"
 	. "webapp/logger"
+)
+
+var (
+	App *appframework.WEBApplication
 )
 
 func RunApplication(application *appframework.WEBApplication) {
@@ -18,11 +21,12 @@ func RunApplication(application *appframework.WEBApplication) {
 	application.EndPort = apptoml.Config.Server.EndPort
 	application.LoggerRootPath = apptoml.Config.Server.Log.LogDir
 	application.Type = appframework.AppTypeWeb
-	globalconfig.App = application
+
 	err := runApp(application)
 	if err != nil {
 		Logger.Error("App.RunListenerApplication err: %v", err)
 	}
+	App = application
 }
 
 func runApp(webApp *appframework.WEBApplication) error {

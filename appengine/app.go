@@ -1,11 +1,12 @@
 package appengine
 
 import (
-	"gitee.com/cristiane/go-common/log"
 	"webapp/appframework"
 	"webapp/apptoml"
 	"webapp/internal/setup"
 	. "webapp/logger"
+
+	"gitee.com/cristiane/go-common/log"
 )
 
 // 初始化application--日志部分

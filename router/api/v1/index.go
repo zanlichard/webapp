@@ -1,16 +1,18 @@
 package v1
 
 import (
-	"webapp/pkg/app"
-	"webapp/pkg/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
-	"webapp/globalconfig"
+	"webapp/appframework/app"
+	"webapp/appframework/code"
+
+	"webapp/appengine"
+
+	"github.com/gin-gonic/gin"
 )
 
 func IndexApi(c *gin.Context) {
-	app.JsonResponse(c, http.StatusOK, code.SUCCESS, "Welcome to "+ globalconfig.App.Name)
+	app.JsonResponse(c, http.StatusOK, code.SUCCESS, "Welcome to "+appengine.App.Name)
 	return
 }
 

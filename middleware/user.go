@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"webapp/pkg/app"
-	"webapp/pkg/code"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"webapp/appframework/app"
+	"webapp/appframework/code"
+
+	"github.com/gin-gonic/gin"
 )
 
 var auth = NewJWT()
