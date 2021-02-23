@@ -2,8 +2,9 @@ package mysql
 
 import (
 	"time"
-    _ "github.com/jinzhu/gorm"
-	)
+
+	_ "github.com/jinzhu/gorm"
+)
 
 /*
 create table t_app_version(
@@ -23,24 +24,24 @@ create table t_app_version(
        primary key(Fid)
 	)engine=innodb default charset=utf8 auto_increment=1;
 
- */
+*/
 
 const TABLEAPPVERSION = "t_app_version"
 
 type AppVersion struct {
-	Id          uint32    `gorm:"primary_key" json:"'Fid' "`
-	ClientType  uint8     `json:"'Fclient_type' "`  // 客户端类型
-	BuildCode   string    `json:"'Fbuild_code' "`   // build值
-	DownloadUrl string    `json:"'Fdownload_url' "` // 下载地址
-	ForceUpdate uint8     `json:"'Fforce_update' "` // 是否强制升级1是，0否
-	VersionName string    `json:"'Fversion_name' "`
-	Title       string    `json:"'Ftitle' "`
-	Content     string    `json:"'Fcontent' "`
-	Remark      string    `json:"'Fremark' "`
-	Status      int8      `json:"'Fstatus' "`      // 0未发布，1已发布，2已经撤销
-	IsDelete    uint8     `json:"'Fis_delete' "`   // 是否删除 1是，0否
-	CreateTime  time.Time `json:"'Fcreate_time' "` //创建时间
-	UpdateTime  time.Time `json:"'Fupdate_time' "`
+	Id          uint32    `gorm:"primary_key"`
+	ClientType  uint8     `gorm:"column:Fclient_type"`  // 客户端类型
+	BuildCode   string    `gorm:"column:Fbuild_code"`   // build值
+	DownloadUrl string    `gorm:"column:Fdownload_url"` // 下载地址
+	ForceUpdate uint8     `gorm:"column:Fforce_update"` // 是否强制升级1是，0否
+	VersionName string    `gorm:"column:Fversion_name"`
+	Title       string    `gorm:"column:Ftitle"`
+	Content     string    `gorm:"column:Fcontent"`
+	Remark      string    `gorm:"column:Fremark"`
+	Status      int8      `gorm:"column:Fstatus"`      // 0未发布，1已发布，2已经撤销
+	IsDelete    uint8     `gorm:"column:Fis_delete"`   // 是否删除 1是，0否
+	CreateTime  time.Time `gorm:"column:Fcreate_time"` //创建时间
+	UpdateTime  time.Time `gorm:"column:Fupdate_time"`
 }
 
 /*
@@ -60,5 +61,4 @@ type AppVersion struct {
 	UpdateTime  time.Time `xorm:"'Fupdate_time' "`
 }
 
- */
-
+*/

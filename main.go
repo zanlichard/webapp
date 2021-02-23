@@ -113,6 +113,7 @@ func main() {
 	initStat()
 	defer exitStat()
 
+	//加载服务依赖
 	if !initServiceDep() {
 		return
 	}

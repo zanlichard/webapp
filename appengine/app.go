@@ -11,7 +11,7 @@ import (
 
 // 初始化application--日志部分
 func initApplication(application *appframework.Application) error {
-	err := log.InitGlobalConfig(apptoml.Config.Server.Log.LogDir, apptoml.Config.Server.Log.LogLevel, application.Name)
+	err := log.InitGlobalConfig(apptoml.Config.Server.Log.FrameworkLog, apptoml.Config.Server.Log.LogLevel, application.Name)
 	if err != nil {
 		Logger.Error("InitGlobalConfig:%+v", err)
 		return err

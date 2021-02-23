@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
+	"strings"
 	"webapp/appframework"
 	"webapp/appframework/app"
 	"webapp/appframework/code"
@@ -15,41 +18,37 @@ func CheckCallSign() gin.HandlerFunc {
 		callServiceId := c.Request.Header.Get(appframework.LocalServiceCfg.CheckIdField)
 		if callServiceId == "" {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERRO_SERVICE_ID_FIELD_NO_EXIST, "")
-			appframework.AccessLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
+			appframework.ErrorLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
 			c.Abort()
 			return
 		}
 		Sign := c.Request.Header.Get(appframework.LocalServiceCfg.CheckSignField)
 		if Sign == "" {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_SIGN_FIELD_NO_EXIST, "")
-			appframework.AccessLogger.Errorf(c, "get header field:%s failed", appframework.LocalServiceCfg.CheckSignField)
+			appframework.ErrorLogger.Errorf(c, "get header field:%s failed", appframework.LocalServiceCfg.CheckSignField)
 			c.Abort()
 			return
 		}
 		bIsAllow := toolkit.ArrayCheckIn(callServiceId, appframework.LocalServiceCfg.AllowServiceIdList)
 		if !bIsAllow {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, "")
-			//appframework.ErrorLogger.Errorf("get header:%s field:%s failed",)
-			c.Abort()
-			return
-		}
-		reqData := ""
-		for _, v := range appframework.LocalServiceCfg.CheckSignData {
-			data := c.Request.Header.Get(v)
-			if data == "" {
-				app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_LOST_SIGN_DATA, "")
-				c.Abort()
-				return
-			}
-			reqData = reqData + data
-		}
-		localSign := toolkit.ApiSign(reqData, appframework.LocalServiceCfg.CheckSignKey)
-		if localSign != Sign {
-			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, "")
+			appframework.ErrorLogger.Errorf(c, "get header field:%s failed", strings.Join(appframework.LocalServiceCfg.AllowServiceIdList, ", "))
 			c.Abort()
 			return
 		}
 
+		body, _ := ioutil.ReadAll(c.Request.Body)
+		reqData := string(body)
+		appframework.BusinessLogger.Infof(c, "body:%s", reqData)
+		localSign := toolkit.ApiSign(reqData, appframework.LocalServiceCfg.CheckSignKey)
+		if localSign != Sign {
+			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, "")
+			appframework.ErrorLogger.Errorf(c, "request sign:%s local sign:%s", Sign, localSign)
+			c.Abort()
+			return
+		}
+		//重新写回,否则业务没有数据
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		c.Next()
 	}
 }

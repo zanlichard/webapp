@@ -4,11 +4,32 @@ import (
 	"github.com/zanlichard/beegoe/validation"
 )
 
+type ReqHeader struct {
+	CallServiceId string `json:"_callerServiceId"`
+	GroupNo       string `json:"_groupNo"`
+	Interface     string `json:"_interface"`
+	InvokeId      string `json:"_invokeId"`
+	MsgType       string `json:"_msgType"`
+	Remark        string `json:"_remark"`
+	Timestamp     string `json:"_timestamps"`
+	Version       string `json:"_version"`
+}
+
 //检查APP版本
 type AppVersionCheckReq struct {
-	ClientType     int8   `form:"client_type" valid:"Required" json:"client_type"` //当前版本
-	CurrentVersion string `form:"current_ver" valid:"Required" json:"current_ver"` //客户端端类型(1:ios,2:android,3:web)
+	ClientType     int8   `valid:"Required" json:"client_type"` //当前版本
+	CurrentVersion string `valid:"Required" json:"current_ver"` //客户端端类型(1:ios,2:android,3:web)
 }
+
+type ParamInfo struct {
+	ApiRequest AppVersionCheckReq `valid:"Required" json:"clientinfo"`
+}
+
+type ReqBody struct {
+	Head  ReqHeader `json:"_head"`
+	Param ParamInfo `json:"_param"` //上层应用定义
+}
+
 type AppVersionCheckRsp struct {
 	BuildCode   string `json:"build_code"`   // 构建的代码
 	DownloadUrl string `json:"download_url"` // 下载的url

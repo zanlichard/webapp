@@ -1,13 +1,14 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"io"
 	"os"
 	"webapp/apptoml"
 	"webapp/middleware"
 	v1 "webapp/router/api/v1"
 	"webapp/stat"
+
+	"github.com/gin-gonic/gin"
 )
 
 func initStat() {
@@ -27,6 +28,7 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 
 	r := gin.Default()
 	r.Use(middleware.Cors())
+	r.Use(middleware.CheckCallSign())
 
 	r.GET("/", v1.IndexApi)
 	r.GET("/ping", v1.PingApi)

@@ -48,6 +48,7 @@ type (
 	}
 
 	log struct {
+		FrameworkLog string `toml:"frameworklogDir"`
 		LogDir       string `toml:"logDir"`
 		LogFile      string `toml:"logFile"`
 		LogLevel     string `toml:"logLevel"`
