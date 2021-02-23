@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	Logger         *logs.BeeLogger
-	AnalysisLogger *logs.BeeLogger
+	Logger *logs.BeeLogger
+	//AnalysisLogger *logs.BeeLogger
 )
 
 func logLevel(lv string) int {
@@ -57,6 +57,6 @@ func CloseLogger() {
 	Logger.Flush()
 	Logger.Close()
 
-	AnalysisLogger.Flush()
-	AnalysisLogger.Close()
+	//AnalysisLogger.Flush()
+	//AnalysisLogger.Close()
 }

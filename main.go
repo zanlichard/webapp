@@ -33,14 +33,6 @@ func initLogger() {
 		logger.Logger = logger.NewLogger("file",
 			apptoml.Config.Server.Log.LogLevel, config, apptoml.Config.Server.Log.ChanLen)
 	}
-	if len(apptoml.Config.Server.Log.AnalysisFile) > 0 {
-		filename := fmt.Sprintf("%s/%s",
-			apptoml.Config.Server.Log.LogDir, apptoml.Config.Server.Log.AnalysisFile)
-		config := logger.NewConfig(filename,
-			apptoml.Config.Server.Log.MaxLines, apptoml.Config.Server.Log.MaxSize, apptoml.Config.Server.Log.MaxDays)
-		logger.AnalysisLogger = logger.NewLogger("file",
-			apptoml.Config.Server.Log.LogLevel, config, apptoml.Config.Server.Log.ChanLen)
-	}
 }
 
 func initEnv() {
@@ -105,7 +97,7 @@ func initServiceDep() bool {
 }
 
 func main() {
-	//应用层初始化
+	//运行配置初始化
 	initEnv()
 	defer exitEnv()
 

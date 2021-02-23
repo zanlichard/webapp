@@ -3,37 +3,26 @@ package client
 import (
 	"io/ioutil"
 	"net/http"
-	"net/url"
+	"strings"
 	"testing"
+	"webapp/appinterface"
+	"webapp/toolkit"
 
 	"gitee.com/cristiane/go-common/json"
 )
 
 const (
-	baseUrlTestAli = "http://39.108.175.129:52002/api"
-	baseUrlDev     = "http://47.106.179.56:52002/api"
-	baseUrlLocal   = "http://localhost:8080/api"
+	baseUrlDev   = "http://192.168.163.128:51001"
+	baseUrlLocal = "http://localhost:51001"
 )
 const (
-	appVersionCheck       = "/resources/app/check_version"
+	appVersionCheck = "/api/v1/app/check_version"
 )
-
-const (
-	apiV1 = "/v1"
-	apiV2 = "/v2"
-)
-
-var apiVersion = apiV2
-var qToken     = token_1000008
-var baseUrl    = baseUrlDev + apiVersion
-
-//基本接口
-func Testwebapp(t *testing.T) {
-	t.Run("APP版本获取", TestAppVersionCheck)
-}
 
 const (
 	SuccessBusinessCode = 0
+	serviceId           = "2160034"
+	serviceKey          = "h6F2GvOm1Q1pR5ATYbMjUIUyscLiBs3E"
 )
 
 type HttpCommonRsp struct {
@@ -43,16 +32,54 @@ type HttpCommonRsp struct {
 }
 
 func TestAppVersionCheck(t *testing.T) {
-	r := baseUrl + appVersionCheck
-	t.Logf("request url: %s", r)
-	data := url.Values{}
-	data.Set("client_type", "1")
-	rsp, err := http.DefaultClient.PostForm(r, data)
+	head := appinterface.ReqHeader{
+		CallServiceId: serviceId,
+		GroupNo:       "1",
+		Interface:     "check_app_version",
+		InvokeId:      "d881c11be7ada28f2d7c602a7c3c20bf",
+		MsgType:       "request",
+		Remark:        "test",
+		Timestamp:     "1608105274",
+		Version:       "0.0.1",
+	}
+	appverCheck := appinterface.AppVersionCheckReq{
+		ClientType:     1,
+		CurrentVersion: "100001",
+	}
+	param := appinterface.ParamInfo{
+		ApiRequest: appverCheck,
+	}
+	request := appinterface.ReqBody{
+		Head:  head,
+		Param: param,
+	}
+	jsonStr, err0 := json.MarshalToString(request)
+	if err0 != nil {
+		t.Error(err0)
+		return
+	}
+
+	signStr := toolkit.ApiSign(jsonStr, serviceKey)
+
+	baseUrl := baseUrlDev + appVersionCheck
+
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(jsonStr))
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	t.Logf("req url: %v status : %v", r, rsp.Status)
+
+	req.Header.Set("HSB-OPENAPI-CALLERSERVICEID", serviceId)
+	req.Header.Set("HSB-OPENAPI-SIGNATURE", signStr)
+	req.Header.Set("content-type", "application/json")
+
+	rsp, err := client.Do(req)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("req url: %+v status : %+v", req, rsp.Status)
 	if rsp.StatusCode != http.StatusOK {
 		t.Error("StatusCode != 200")
 		return
@@ -63,7 +90,7 @@ func TestAppVersionCheck(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	t.Logf("req url: %v body : \n%s", r, body)
+	t.Logf("req url: %v body : \n%s", req, body)
 	var obj HttpCommonRsp
 	err = json.Unmarshal(string(body), &obj)
 	if err != nil {
@@ -76,8 +103,7 @@ func TestAppVersionCheck(t *testing.T) {
 	}
 }
 
-
-
-
-
-
+//基本接口
+func Testwebapp(t *testing.T) {
+	t.Run("APP版本获取", TestAppVersionCheck)
+}

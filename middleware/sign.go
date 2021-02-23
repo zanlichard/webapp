@@ -47,7 +47,7 @@ func CheckCallSign() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		//重新写回,否则业务没有数据
+		//閲嶆柊鍐欏洖,鍚﹀垯涓氬姟娌℃湁鏁版嵁
 		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		c.Next()
 	}
