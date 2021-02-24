@@ -1,9 +1,12 @@
 package appinterface
 
 import (
+	"webapp/toolkit"
+
 	"github.com/zanlichard/beegoe/validation"
 )
 
+//基本协议头定义
 type ReqHeader struct {
 	CallServiceId string `json:"_callerServiceId"`
 	GroupNo       string `json:"_groupNo"`
@@ -15,21 +18,13 @@ type ReqHeader struct {
 	Version       string `json:"_version"`
 }
 
-//检查APP版本
+//检查APP版本请求定义
 type AppVersionCheckReq struct {
 	ClientType     int8   `valid:"Required" json:"client_type"` //当前版本
 	CurrentVersion string `valid:"Required" json:"current_ver"` //客户端端类型(1:ios,2:android,3:web)
 }
 
-type ParamInfo struct {
-	ApiRequest AppVersionCheckReq `valid:"Required" json:"clientinfo"`
-}
-
-type ReqBody struct {
-	Head  ReqHeader `json:"_head"`
-	Param ParamInfo `json:"_param"` //上层应用定义
-}
-
+//检查APP版本响应定义
 type AppVersionCheckRsp struct {
 	BuildCode   string `json:"build_code"`   // 构建的代码
 	DownloadUrl string `json:"download_url"` // 下载的url
@@ -38,6 +33,17 @@ type AppVersionCheckRsp struct {
 	Title       string `json:"title"`        // 标题
 	Content     string `json:"content"`      // 内容
 	Remark      string `json:"remark"`       // 备注
+}
+
+//业务请求嵌套定义
+type ParamInfo struct {
+	ApiRequest AppVersionCheckReq `valid:"Required" json:"clientinfo"`
+}
+
+//基本请求体定义
+type ReqBody struct {
+	Head  ReqHeader `json:"_head"`
+	Param ParamInfo `json:"_param"` //上层应用定义
 }
 
 func (t *AppVersionCheckReq) Valid(v *validation.Validation) {
@@ -50,7 +56,43 @@ func (t *AppVersionCheckReq) Valid(v *validation.Validation) {
 
 }
 
-type Page struct {
-	PageSize int `form:"page_size" json:"page_size"`
-	PageNum  int `form:"page_num"  json:"page_num"`
+//基本配置管理接口定义(header)
+type BasicCfgGetReq struct {
+	CfgType string `valid:"Required" json:"cfg_type"` //rabbitmq,mysql,redis,mongo as the key
+
+}
+
+func (t *BasicCfgGetReq) Valid(v *validation.Validation) {
+	supportedTypes := []string{"rabbitmq", "mysql", "redis", "mongo"}
+	if !toolkit.ArrayCheckIn(t.CfgType, supportedTypes) {
+		v.SetError("cfg_type", "不支持的类型")
+	}
+}
+
+type BasicCfgGetRsp struct {
+	UserName     string   `json:"user_name"`
+	Passwd       string   `json:"pass_word"`
+	Database     string   `json:"database_name"`
+	Hosts        []string `json:"host_names"`
+	MaxOpenConns int      `json:"max_open_conns"`
+	MaxIdleConns int      `json:"max_idle_conns"`
+	IdleTimeout  int      `json:"idle_timeout"`
+	MaxActive    int      `json:"max_active"` //redis
+	Other        string   `json:"extends"`    //rabbitmq-vhost-queue
+}
+
+//依赖配置管理接口定义(header)
+type DepCfgGetReq struct {
+	IsServicesAll bool   `form:"is_services_all" valid:"Required"` //是否全部读取,false,则需要指定service_name
+	ServiceName   string `form:"service_name"`                     //服务名
+}
+
+type ServiceItem struct {
+	ServiceName string `json:"service_name"`
+	ServiceId   string `json:"service_id"`
+	ServiceKey  string `json:"service_key"`
+}
+
+type DepCfgGetRsp struct {
+	Services []ServiceItem `json:"services"`
 }
