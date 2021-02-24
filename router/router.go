@@ -9,6 +9,8 @@ import (
 	v1 "webapp/router/api/v1"
 	"webapp/stat"
 
+	"github.com/gin-contrib/pprof"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,6 +34,11 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 	}
 
 	r := gin.Default()
+
+	if apptoml.Config.Server.Debug {
+		pprof.Register(r)
+	}
+
 	r.Use(middleware.Cors())
 	r.GET("/", v1.IndexApi)
 	r.GET("/ping", v1.PingApi)

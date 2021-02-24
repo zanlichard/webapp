@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-func md5Digest(data string) string {
+func Md5Digest(data string) string {
 	dataBytes := []byte(data)
 	digestBytes := md5.Sum(dataBytes)
 	md5Str := fmt.Sprintf("%x", digestBytes)
@@ -15,7 +15,7 @@ func md5Digest(data string) string {
 
 func ApiSign(req string, key string) string {
 	signStr := req + "_" + key
-	return md5Digest(signStr)
+	return Md5Digest(signStr)
 }
 
 func ArrayCheckIn(target string, strArray []string) bool {

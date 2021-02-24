@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -32,6 +33,11 @@ type HttpCommonRsp struct {
 	Msg  string      `json:"msg"`
 }
 
+func TestRune(t *testing.T) {
+	var i int = 122
+	c1 := rune(i)
+	fmt.Println("98 convert to", string(c1))
+}
 func TestGetBasicCfg(t *testing.T) {
 	request := appinterface.BasicCfgGetReq{
 		"mysql",

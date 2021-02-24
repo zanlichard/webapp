@@ -17,11 +17,13 @@ func (a Int64Arr) Less(i, j int) bool { return a[i] < a[j] }
 
 func RandomLowerLetterString(l int) string {
 	var result bytes.Buffer
-	var temp string
+	var temp rune = 'a'
 	for i := 0; i < l; {
-		if string(RandomInt(97, 122)) != temp {
-			temp = string(RandomInt(97, 122))
-			result.WriteString(temp)
+		randX := RandomInt(97, 122)
+		if rune(randX) != temp {
+			temp = rune(randX)
+			strChar := string(temp)
+			result.WriteString(strChar)
 			i++
 		}
 	}
