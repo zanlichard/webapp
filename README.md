@@ -7,10 +7,10 @@ Designed for c++ engineer developping web applications rapidly
 - [Main Directory Guide](#main-directory-guide)
   - [Configure](#configure)
   - [Framework Entry](#framework-entry)
-    - [appengine](#appengine)
-    - [appframework](#appframework)
-    - [appframeworkboot](#appframeworkboot)
-    - [appinterface](#appinterface)
+    - [Appengine](#Appengine)
+    - [Appframework](#Appframework)
+    - [Appframeworkboot](#Appframeworkboot)
+    - [Appinterface](#Appinterface)
   - [Application Develop](#application-develop)
     - [Router](#router)
     - [Service](#service)
@@ -38,20 +38,20 @@ Designed for c++ engineer developping web applications rapidly
 Application main config is toml format
 
 ## Framework Entry
-### appengine
+### Appengine
 Designed for setup framework instance
 
-### appframework
-Define framework level errcode 401,400 for example
-Define service local config
-Define service dependent config
-Define framework global variables
+### Appframework
+Define framework level errcode 401,400 for example<br>
+Define service local config<br>
+Define service dependent config<br>
+Define framework global variables<br>
 
-### appframeworkboot
-Setup associate config such as crontab task for delete expire log
-Init framework global varibles
+### Appframeworkboot
+Setup associate config such as crontab task for delete expire log<br>
+Init framework global varibles<br>
 
-### appinterface
+### Appinterface
 Define application api interface,such as json supported protocol object
 
 ## Application Develop
@@ -63,8 +63,8 @@ Define application interface url
 Define business logic
 
 ### Errors
-Define business error code and error message
-Support local call statck
+Define business error code and error message<br>
+Support local call statck<br>
 
 ### Dao
 Define data access according to mysql redis mongo driver
@@ -77,9 +77,9 @@ Define data object,such as mysql table object
 When app runs,it will push api call stat,errcode stat,delay stat,in and out flow stat info into stat log file at regular intervals
 
 ## Storage Middleware
-Support mysql based on gorm
-Support redis based on redisgoe 
-Support mongo
+Support mysql based on gorm<br>
+Support redis based on redisgoe<br>
+Support mongo<br>
 
 ## Message Queue Middleware
 Just support rabbitmq
@@ -87,27 +87,27 @@ Just support rabbitmq
 
 ## Other
 ### Middleware
-Support token based on jwt
-Support interface sign
+Support token based on jwt<br>
+Support interface sign<br>
 
 ### Toolkit
 Define custom function 
 
 ### Internal
-Support promethus metrics scan
-Support pprof performance data scan,such goroutines,threads,heap info
+Support promethus metrics scan<br>
+Support pprof performance data scan,such as goroutines,threads,heap info<br>
 
 ## Use Restrictions
 
 ### Logging
-Dao layer suggest printing no log
-Api layer print detail log about http
-Service layer print business log
+Dao layer suggest printing no log<br>
+Api layer print detail log about http<br>
+Service layer print business log<br>
 
 ### ErrorCode
-Dao layer return base errcode
-Service layer return business define errcode
-Api layer may return standard error base on http and business errcode
+Dao layer return base errcode<br>
+Service layer return business define errcode<br>
+Api layer may return standard error base on http and business errcode<br>
 
 ### Monitoring Add
 Monitor keyword define in api layer,init at router layer
