@@ -49,7 +49,7 @@ Define framework global variables<br>
 
 ### Appframeworkboot
 Setup associate config such as crontab task for delete expire log<br>
-Init framework global varibles
+Init framework global varibles<br>
 
 ### Appinterface
 Define application api interface,such as json supported protocol object
@@ -63,8 +63,8 @@ Define application interface url
 Define business logic
 
 ### Errors
-Define business error code and error message
-Support local call statck
+Define business error code and error message<br>
+Support local call statck<br>
 
 ### Dao
 Define data access according to mysql redis mongo driver
@@ -95,7 +95,7 @@ Define custom function
 
 ### Internal
 Support promethus metrics scan<br>
-Support pprof performance data scan,such goroutines,threads,heap info<br>
+Support pprof performance data scan,such as goroutines,threads,heap info<br>
 
 ## Use Restrictions
 
