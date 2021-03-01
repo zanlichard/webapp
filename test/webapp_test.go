@@ -40,7 +40,7 @@ func TestRune(t *testing.T) {
 }
 func TestGetBasicCfg(t *testing.T) {
 	request := appinterface.BasicCfgGetReq{
-		"mysql",
+		"rabbitmq",
 	}
 	jsonStr, err0 := json.MarshalToString(request)
 	if err0 != nil {

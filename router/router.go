@@ -50,6 +50,7 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 	}
 	apiG := r.Group("/api")
 	r.Use(middleware.CheckCallSign())
+	//r.Use(middleware.CheckUserToken())
 	apiV1 := apiG.Group("/v1")
 	{
 		apiResources := apiV1.Group("/app")

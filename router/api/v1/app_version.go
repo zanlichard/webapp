@@ -11,6 +11,7 @@ import (
 	"webapp/errors"
 	"webapp/service"
 	"webapp/stat"
+	"webapp/toolkit"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,18 +26,21 @@ func CheckAppVersionApi(c *gin.Context) {
 	var form appinterface.ReqBody
 	ipSrc := net.ParseIP(c.Request.RemoteAddr)
 	payload := int(c.Request.ContentLength)
-	err := app.BindAndValid(c, &form)
-	appframework.BusinessLogger.Infof(c, "req body:%+v", form)
+	_, sessId, err := toolkit.GetUniqId(StatGetAppVersion)
+	if err != nil {
+		appframework.ErrorLogger.Infof(c, "generate session id failed for:%+v", err)
+	}
+	err = app.BindAndValid(c, &form)
+	appframework.BusinessLogger.Infof(c, "session:%s req body:%+v", sessId, form)
 	if err != nil {
 		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, err.Error())
-		appframework.ErrorLogger.Errorf(c, "GetAppVersion form: %+v, err: %+v", form, err)
+		appframework.ErrorLogger.Errorf(c, "session:%s GetAppVersion form: %+v, err: %+v", sessId, form, err)
 		go stat.PushStat(StatGetAppVersion, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
 		return
 	}
-	//c.ShouldBindJSON(&form)
-	result, retCode := service.GetAppVersion(c, &form.Param.ApiRequest)
+	result, retCode := service.GetAppVersion(c, sessId, &form.Param.ApiRequest)
 	if retCode != errors.RetCode_SUCCESS {
-		appframework.ErrorLogger.Errorf(c, "GetAppVersion form: %+v, err: %+v", form, err)
+		appframework.ErrorLogger.Errorf(c, "session:%s GetAppVersion form: %+v, err: %+v", sessId, form, err)
 		app.JsonResponse(c, http.StatusOK, int(retCode), nil)
 		go stat.PushStat(StatGetAppVersion, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(retCode))
 		return
