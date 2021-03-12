@@ -67,7 +67,7 @@ Define business logic
 
 ### Errors
 Define business error code and error message<br>
-Support local call statck<br>
+Support local call stack<br>
 
 ### Dao
 Define data access according to mysql redis mongo driver
