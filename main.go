@@ -36,7 +36,12 @@ func initLogger() {
 }
 
 func initEnv() {
+	//初始化配置系统
+	apptoml.Init()
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	//初始化日志系统
 	initLogger()
 }
 
@@ -97,7 +102,7 @@ func initServiceDep() bool {
 }
 
 func main() {
-	//运行配置初始化
+	//运行环境初始化
 	initEnv()
 	defer exitEnv()
 
@@ -118,7 +123,8 @@ func main() {
 	maxOpen := apptoml.Config.Database.Mysql.MaxOpenConns
 	maxIdle := apptoml.Config.Database.Mysql.MaxIdleConns
 	idleTime := apptoml.Config.Database.Mysql.IdleTimeout
-	storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime)
+	debug := apptoml.Config.Server.Debug
+	storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime, debug)
 
 	//框架初始化
 	application := &appframework.WEBApplication{

@@ -7,7 +7,7 @@ import (
 )
 
 /*
-insert into t_app_version(Fclient_type,Fbuild_code,Fdownload_url,Fforce_update,Fversion_name,Ftitle,Fcontent,Fremark,Fstatus) values('1','test','http://ztiao.club.com',1,"??",'????','????','??','1');
+insert into t_app_version(Fclient_type,Fbuild_code,Fdownload_url,Fforce_update,Fversion_name,Ftitle,Fcontent,Fremark,Fstatus) values('1','test','http://ztiao.club.com',1,"aaa",'xx','xyz','dx','1');
 */
 func GetAppVersionRecord(session string, clientType int8) (*mysql.AppVersion, error) {
 	var versionRecord mysql.AppVersion

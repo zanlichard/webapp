@@ -2,19 +2,19 @@ package service
 
 import (
 	"context"
+	e "webapp/apperrors"
 	"webapp/appinterface"
 	"webapp/dao"
-	"webapp/errors"
 	. "webapp/logger"
 )
 
 //获取app可用版本
-func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppVersionCheckReq) (*appinterface.AppVersionCheckRsp, errors.RetCode) {
+func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppVersionCheckReq) (*appinterface.AppVersionCheckRsp, e.RetCode) {
 	//取最新的1条记录
 	result, err := dao.GetAppVersionRecord(sessionId, req.ClientType)
 	if err != nil {
 		Logger.Error("session:%s GetAppVersion failed for:%+v", sessionId, err)
-		return nil, errors.RetCode_ERR_DB_SERVER
+		return nil, e.RetCode_ERR_DB_SERVER
 	}
 	rsp := new(appinterface.AppVersionCheckRsp)
 	rsp.BuildCode = result.BuildCode
@@ -26,5 +26,5 @@ func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppV
 	rsp.VersionName = rsp.Title
 
 	Logger.Error("session:%s rsp:%+v ", sessionId, rsp)
-	return rsp, errors.RetCode_SUCCESS
+	return rsp, e.RetCode_SUCCESS
 }

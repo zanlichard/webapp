@@ -1,4 +1,4 @@
-package errors
+package apperrors
 
 import (
 	"bytes"
@@ -13,10 +13,10 @@ import (
 type (
 	// AppError is the error description of application
 	AppError struct {
-		Err      error  `json:"err"`       // error return by function
-		ErrPoint string `json:"err_point"` // error point stores context of function call, contains file, line and function
-		Code     int    `json:"-"`         // error code
-		Msg      string `json:"-"`         // error description
+		Err      error   `json:"err"`       // error return by function
+		ErrPoint string  `json:"err_point"` // error point stores context of function call, contains file, line and function
+		Code     RetCode `json:"-"`         // error code
+		Msg      string  `json:"-"`         // error description
 	}
 
 	// CallStack stores information about the active subroutines
@@ -39,7 +39,7 @@ type (
 	// CallStackWrapper is the wrapper of CallStack, use to generate error messages
 	CallStackWrapper struct {
 		Cs             *CallStack          `json:"callstack"`
-		Code           int                 `json:"code"`
+		Code           RetCode             `json:"code"`
 		Msg            string              `json:"msg"`
 		Stat           map[string]StatInfo `json:"stat"`
 		ErrPath        string              `json:"err_path"`
@@ -49,8 +49,6 @@ type (
 	}
 )
 
-
-
 const (
 	SUCCESS     = 0
 	ERR_UNKNOWN = -1
@@ -59,7 +57,7 @@ const (
 var (
 	tags = []string{"mysql", "redis"}
 
-	errorMap = map[int]string{
+	errorMap = map[RetCode]string{
 		SUCCESS:     "Success",
 		ERR_UNKNOWN: "Unknown Error",
 	}
@@ -70,8 +68,8 @@ var (
 	strAppName string
 )
 
-func Init(appName string){
-   strAppName = appName
+func Init(appName string) {
+	strAppName = appName
 }
 
 // RegisterTags register tags array, use for prefix matching when generate error message
@@ -82,7 +80,7 @@ func RegisterTags(tag []string) {
 }
 
 // RegisterError register error code and corresponding error message
-func RegisterError(errMap map[int]string) {
+func RegisterError(errMap map[RetCode]string) {
 	for code, msg := range errMap {
 		if _, ok := errorMap[code]; !ok {
 			errorMap[code] = msg
@@ -215,7 +213,7 @@ func (s *CallStack) GetTimeoutPath(arr []string, funcTimeout int64) string {
 }
 
 // SetCode sets error code and the corresponding error message
-func (err *AppError) SetCode(code int) {
+func (err *AppError) SetCode(code RetCode) {
 	err.Code = code
 	msg, ok := errorMap[code]
 	if !ok {
@@ -226,7 +224,7 @@ func (err *AppError) SetCode(code int) {
 }
 
 // GetCodeMsg returns the code message
-func (err *AppError) GetCodeMsg() (int, string) {
+func (err *AppError) GetCodeMsg() (RetCode, string) {
 	return err.Code, err.Msg
 }
 

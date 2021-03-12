@@ -4,11 +4,11 @@ import (
 	"net"
 	"net/http"
 	"time"
+	e "webapp/apperrors"
 	"webapp/appframework"
 	"webapp/appframework/app"
 	"webapp/appframework/code"
 	"webapp/appinterface"
-	"webapp/errors"
 	"webapp/service"
 	"webapp/stat"
 	"webapp/toolkit"
@@ -39,7 +39,7 @@ func CheckAppVersionApi(c *gin.Context) {
 		return
 	}
 	result, retCode := service.GetAppVersion(c, sessId, &form.Param.ApiRequest)
-	if retCode != errors.RetCode_SUCCESS {
+	if retCode != e.RetCode_SUCCESS {
 		appframework.ErrorLogger.Errorf(c, "session:%s GetAppVersion form: %+v, err: %+v", sessId, form, err)
 		app.JsonResponse(c, http.StatusOK, int(retCode), nil)
 		go stat.PushStat(StatGetAppVersion, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(retCode))
@@ -47,5 +47,5 @@ func CheckAppVersionApi(c *gin.Context) {
 	}
 
 	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
-	go stat.PushStat(StatGetAppVersion, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(errors.RetCode_SUCCESS))
+	go stat.PushStat(StatGetAppVersion, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 }

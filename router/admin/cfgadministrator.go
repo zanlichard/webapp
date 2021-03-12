@@ -4,12 +4,12 @@ import (
 	"net"
 	"net/http"
 	"time"
+	e "webapp/apperrors"
 	"webapp/appframework"
 	"webapp/appframework/app"
 	"webapp/appframework/code"
 	"webapp/appinterface"
 	"webapp/apptoml"
-	"webapp/errors"
 	"webapp/stat"
 
 	"github.com/gin-gonic/gin"
@@ -67,7 +67,7 @@ func GetBasicConfig(c *gin.Context) {
 		result.IdleTimeout = 0
 	}
 	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
-	go stat.PushStat(StatGetBasicCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(errors.RetCode_SUCCESS))
+	go stat.PushStat(StatGetBasicCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 }
 
 func GetDependentConfig(c *gin.Context) {
@@ -92,7 +92,7 @@ func GetDependentConfig(c *gin.Context) {
 	}
 	result.Services = append(result.Services, item)
 	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
-	go stat.PushStat(StatGetDependentCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(errors.RetCode_SUCCESS))
+	go stat.PushStat(StatGetDependentCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 
 }
 
