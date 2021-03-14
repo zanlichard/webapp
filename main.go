@@ -77,6 +77,10 @@ func exitStat() {
 	stat.Exit()
 }
 
+func releaseDB() {
+	storage.ExitDB()
+}
+
 //从配置管理中心获取服务的自身配置和依赖的外部服务的配置
 func initServiceDependence() bool {
 	acl := appframework.LocalAcl{
@@ -127,7 +131,12 @@ func main() {
 	maxIdle := apptoml.Config.Database.Mysql.MaxIdleConns
 	idleTime := apptoml.Config.Database.Mysql.IdleTimeout
 	debug := apptoml.Config.Server.Debug
-	storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime, debug)
+	err := storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime, debug)
+	if err != nil {
+		logger.Logger.Error("init database err:%+v", err.Error())
+		return
+	}
+	defer releaseDB()
 
 	//框架初始化
 	application := &appframework.WEBApplication{

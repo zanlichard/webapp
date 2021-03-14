@@ -46,11 +46,11 @@ func GetBasicConfig(c *gin.Context) {
 		result.IdleTimeout = apptoml.Config.Database.Mysql.IdleTimeout
 
 	case "redis":
-		result.Passwd = apptoml.Config.Redisinfo.Passwd
-		result.Hosts = apptoml.Config.Redisinfo.ServerList
-		result.MaxOpenConns = apptoml.Config.Redisinfo.MaxIdle
-		result.IdleTimeout = apptoml.Config.Redisinfo.IdleTimeout
-		result.MaxActive = apptoml.Config.Redisinfo.MaxActive
+		result.Passwd = apptoml.Config.RedisInfo.Passwd
+		result.Hosts = apptoml.Config.RedisInfo.ServerList
+		result.MaxOpenConns = apptoml.Config.RedisInfo.MaxIdle
+		result.IdleTimeout = apptoml.Config.RedisInfo.IdleTimeout
+		result.MaxActive = apptoml.Config.RedisInfo.MaxActive
 
 	case "rabbitmq":
 		result.UserName = apptoml.Config.RabbitMq.Username
