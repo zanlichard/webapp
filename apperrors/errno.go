@@ -18,18 +18,20 @@ const (
 	RetCode_ERR_MARSH              RetCode = RetCode_Base + 10
 
 	//redis相关错误(21~40)
-	RetCode_ERR_CACHE_GET   RetCode = RetCode_Base + 21
-	RetCode_ERR_CACHE_MISS  RetCode = RetCode_Base + 22
-	RetCode_ERR_CACHE_SET   RetCode = RetCode_Base + 23
-	RetCode_ERR_CACHE_SETE  RetCode = RetCode_Base + 24
-	RetCode_ERR_CACHE_TTL   RetCode = RetCode_Base + 25
-	RetCode_ERR_CACHE_DEL   RetCode = RetCode_Base + 26
-	RetCode_ERR_CACHE_PUB   RetCode = RetCode_Base + 27
-	RetCode_ERR_CACHE_MGET  RetCode = RetCode_Base + 28
-	RetCode_ERR_CACHE_SETX  RetCode = RetCode_Base + 29
-	RetCode_ERR_CACHE_FLUSH RetCode = RetCode_Base + 30
-	RetCode_ERR_CACHE_LPUSH RetCode = RetCode_Base + 31
-	RetCode_ERR_CACHE_MSET  RetCode = RetCode_Base + 32
+	RetCode_ERR_CACHE_INIT  RetCode = RetCode_Base + 21
+	RetCode_ERR_CACHE_GET   RetCode = RetCode_Base + 22
+	RetCode_ERR_CACHE_MISS  RetCode = RetCode_Base + 23
+	RetCode_ERR_CACHE_SET   RetCode = RetCode_Base + 24
+	RetCode_ERR_CACHE_SETE  RetCode = RetCode_Base + 25
+	RetCode_ERR_CACHE_TTL   RetCode = RetCode_Base + 26
+	RetCode_ERR_CACHE_DEL   RetCode = RetCode_Base + 27
+	RetCode_ERR_CACHE_PUB   RetCode = RetCode_Base + 28
+	RetCode_ERR_CACHE_MGET  RetCode = RetCode_Base + 29
+	RetCode_ERR_CACHE_SETX  RetCode = RetCode_Base + 30
+	RetCode_ERR_CACHE_FLUSH RetCode = RetCode_Base + 31
+	RetCode_ERR_CACHE_LPUSH RetCode = RetCode_Base + 32
+	RetCode_ERR_CACHE_MSET  RetCode = RetCode_Base + 33
+	RetCode_ERR_CACHE_PING  RetCode = RetCode_Base + 34
 
 	//DB相关错误(41~60)
 	RetCode_ERR_DB_NOT_READY RetCode = RetCode_Base + 41
@@ -61,6 +63,7 @@ var RetCodeMsg = map[RetCode]string{
 	RetCode_ERR_MARSH:              "数据转换json失败",
 
 	//redis错误(21~40)
+	RetCode_ERR_CACHE_INIT:  "redis初始化失败",
 	RetCode_ERR_CACHE_GET:   "redis读取失败",
 	RetCode_ERR_CACHE_MISS:  "redis数据不存在",
 	RetCode_ERR_CACHE_SET:   "redis保存数据失败",
@@ -73,6 +76,7 @@ var RetCodeMsg = map[RetCode]string{
 	RetCode_ERR_CACHE_FLUSH: "redis刷新失败",
 	RetCode_ERR_CACHE_LPUSH: "redis列表插入元素失败",
 	RetCode_ERR_CACHE_MSET:  "redis批量写入失败",
+	RetCode_ERR_CACHE_PING:  "redis Ping失败",
 
 	//数据库错误(41~60)
 	RetCode_ERR_DB_NOT_READY: "DB访问未初始化",

@@ -12,15 +12,18 @@ type User struct {
 }
 
 func TestRedisSet(t *testing.T) {
-	InitCache("192.168.163.129", 6379, "hsb_redis_123", false)
-	conn, err := GetRedisConn(CacheRedis, 3000)
-	if conn != nil {
-		defer conn.Close()
-	}
-
+	//InitCache("192.168.163.129", 6379, "hsb_redis_123", false)
+	err := InitCache("192.168.37.131", 6379, "hsb_redis_123", 5, 20, 300, false)
 	if err != nil {
-		t.Error("TestRedisSet get connection error")
+		t.Error("TestRedisSet init redis error")
+		return
 	}
+	conn := GetRedisConn("cache", 3000)
+	if conn == nil {
+		t.Errorf("TestRedisSet get connection error:%+v", err)
+		return
+	}
+	defer conn.Close()
 
 	user := new(User)
 	user.UserId = "boa@japan"
@@ -44,18 +47,20 @@ func TestRedisSet(t *testing.T) {
 }
 
 func TestCacheMGet(t *testing.T) {
-	InitCache("192.168.163.129", 6379, "hsb_redis_123", false)
+	err := InitCache("192.168.163.129", 6379, "hsb_redis_123", 5, 20, 300, false)
+	if err != nil {
+		t.Error("TestRedisSet init redis error")
+		return
+	}
 	us := make([]*User, 4, 4)
 	ks := []string{"user1", "user2", "user4", "user3"}
 
-	conn, err := GetRedisConn(CacheRedis, 3000)
-	if conn != nil {
-		defer conn.Close()
-	}
-
-	if err != nil {
+	conn := GetRedisConn("cache", 3000)
+	if conn == nil {
 		t.Error("TestRedisSet get connection error")
+		return
 	}
+	defer conn.Close()
 
 	rs, st := RedisMGet(conn, ks, 3000)
 
@@ -71,8 +76,8 @@ func TestCacheMGet(t *testing.T) {
 
 	for i, r := range rs {
 		if r != "" {
-			err = json.Unmarshal([]byte(r), &us[i])
-			if err != nil {
+			err1 := json.Unmarshal([]byte(r), &us[i])
+			if err1 != nil {
 				t.Log("redis mget transfer error")
 				continue
 			}

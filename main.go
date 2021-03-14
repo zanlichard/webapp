@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"time"
 	"webapp/appengine"
+	"webapp/apperrors"
 	"webapp/appframework"
 	"webapp/appframeworkboot"
 	"webapp/apptoml"
@@ -38,6 +39,8 @@ func initLogger() {
 func initEnv() {
 	//初始化配置系统
 	apptoml.Init()
+
+	apperrors.Init(AppName)
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -75,7 +78,7 @@ func exitStat() {
 }
 
 //从配置管理中心获取服务的自身配置和依赖的外部服务的配置
-func initServiceDep() bool {
+func initServiceDependence() bool {
 	acl := appframework.LocalAcl{
 		LocalServiceId:     "2160037",
 		CheckAlgorithm:     "md5",
@@ -111,7 +114,7 @@ func main() {
 	defer exitStat()
 
 	//加载服务依赖
-	if !initServiceDep() {
+	if !initServiceDependence() {
 		return
 	}
 

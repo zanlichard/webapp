@@ -20,11 +20,12 @@ type (
 		Title     string    `toml:"title"`
 		Server    server    `toml:"server"`
 		Database  database  `toml:"database"`
-		Redisinfo redisinfo `toml:"redisinfo"`
-		RabbitMq  rabbitmq  `toml:"rabbitmq"`
-		ConfigMng cfgcenter `toml:"cfgcenter"`
+		RedisInfo redisInfo `toml:"redisInfo"`
+		RabbitMq  rabbitMq  `toml:"rabbitMq"`
+		ConfigMng cfgCenter `toml:"cfgCenter"`
+		Mongodb   mongoDb   `toml:"mongoDb"`
 	}
-	rabbitmq struct {
+	rabbitMq struct {
 		Username   string `toml:"username"`
 		Password   string `toml:"password"`
 		ServerAddr string `toml:"server"`
@@ -88,7 +89,7 @@ type (
 		IdleTimeout  int    `toml:"idletimeout"`
 	}
 
-	redisinfo struct {
+	redisInfo struct {
 		ServerList  []string `toml:"serverlist"`
 		Passwd      string   `toml:"passwd"`
 		MaxIdle     int      `toml:"maxIdle"`
@@ -96,12 +97,20 @@ type (
 		IdleTimeout int      `toml:"idleTimeout"`
 	}
 
-	cfgcenter struct {
+	mongoDb struct {
+		Username string `toml:"username"`
+		Password string `toml:"password"`
+		Server   string `toml:"server"`
+		Port     int    `toml:"port"`
+		DB       string `toml:"dbname"`
+	}
+
+	cfgCenter struct {
 		MasterServerList []string `toml:"masterAddrList"`
 	}
 )
 
-func init() {
+func Init() {
 	if configFile == "" {
 		configFile = "./etc/config.toml"
 	}

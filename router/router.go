@@ -16,10 +16,10 @@ import (
 
 func initStat() {
 	stat.GStat.AddReportBodyRowItem(v1.StatGetAppVersion)
-	stat.GStat.AddReportErrorItem(v1.StatGetAppVersion)
 	stat.GStat.AddReportBodyRowItem(admin.StatGetBasicCfg)
-	stat.GStat.AddReportErrorItem(admin.StatGetBasicCfg)
 	stat.GStat.AddReportBodyRowItem(admin.StatGetDependentCfg)
+	stat.GStat.AddReportErrorItem(v1.StatGetAppVersion)
+	stat.GStat.AddReportErrorItem(admin.StatGetBasicCfg)
 	stat.GStat.AddReportErrorItem(admin.StatGetDependentCfg)
 }
 

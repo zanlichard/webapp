@@ -2,7 +2,6 @@ package storage
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -26,23 +25,33 @@ const (
 )
 
 var (
-	DefaultRedisTimeout = 30 * time.Second
-	RedisCachePool      *redis.Pool
-	CacheRedis          = "cache"
-	OpenStat            = false
+	defaultRedisTimeout = 30 * time.Second
+	redisCachePool      *redis.Pool
+	cacheRedis          = "cache"
+	openStat            = false
 )
 
-func InitCache(RedisHost string, RedisPort int, RedisPasswd string, SwitchStat bool) {
+func InitCache(redisHost string, redisPort int, redisPasswd string, maxIdleConn int, maxActiveConn int, idleTimeout int, statSwitch bool) *e.AppError {
 	//Logger.Debug("InitCache host:%s port:%d", RedisHost, RedisPort)
-	redisServer := fmt.Sprintf("%s:%d", RedisHost, RedisPort)
-	RedisCachePool = redisConnectPool(redisServer, RedisPasswd)
-	if SwitchStat {
-		OpenStat = true
-		InitRedisStat()
+	redisServer := fmt.Sprintf("%s:%d", redisHost, redisPort)
+	redisCachePool = redisConnectPool(redisServer, redisPasswd, maxIdleConn, maxActiveConn, idleTimeout)
+	if redisCachePool == nil {
+		retCode := e.RetCode_ERR_CACHE_INIT
+		return &e.AppError{Msg: e.RetCodeMsg[retCode], Err: nil, Code: retCode, ErrPoint: e.GetErrPoint(1)}
+	} else {
+		if _, err := redisCachePool.Get().Do("PING"); err != nil {
+			retCode := e.RetCode_ERR_CACHE_PING
+			return &e.AppError{Msg: e.RetCodeMsg[retCode], Err: nil, Code: retCode, ErrPoint: e.GetErrPoint(1)}
+		}
 	}
+	if statSwitch {
+		openStat = true
+		redisStat()
+	}
+	return nil
 }
 
-func InitRedisStat() {
+func redisStat() {
 	stat.GStat.AddReportBodyRowItem(StatCacheGet)
 	stat.GStat.AddReportBodyRowItem(StatCacheSet)
 	stat.GStat.AddReportBodyRowItem(StatCacheDel)
@@ -65,15 +74,16 @@ func InitRedisStat() {
 
 }
 
-func redisConnectPool(server, passwd string) *redis.Pool {
+func redisConnectPool(server, passwd string, maxIdle int, maxActive int, idleTimeout int) *redis.Pool {
 	return &redis.Pool{
-		MaxIdle:     5,
-		IdleTimeout: 300 * time.Second,
+		MaxIdle:     maxIdle,
+		IdleTimeout: time.Duration(idleTimeout) * time.Second,
+		MaxActive:   maxActive,
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.DialTimeout("tcp", server,
-				DefaultRedisTimeout,
-				DefaultRedisTimeout,
-				DefaultRedisTimeout)
+				defaultRedisTimeout,
+				defaultRedisTimeout,
+				defaultRedisTimeout)
 			if err != nil {
 				return nil, err
 			}
@@ -92,16 +102,16 @@ func redisConnectPool(server, passwd string) *redis.Pool {
 	}
 }
 
-func GetRedisConn(which string, timeleft int64) (redis.Conn, error) {
+func GetRedisConn(which string, timeleft int64) redis.Conn {
 	if timeleft <= 0 {
-		return nil, errors.New("No time left for redis operation, proc timeout")
+		return nil
 	}
-	switch which {
-	case CacheRedis:
-		return RedisCachePool.Get(), nil
-	default:
-		return nil, errors.New("No such redis")
+	conn := redisCachePool.Get()
+	if conn.GetConn() == nil {
+		return nil
 	}
+	return conn
+
 }
 
 func RedisDel(conn redis.Conn, k string) *e.CallStack {
@@ -115,7 +125,7 @@ func RedisDel(conn redis.Conn, k string) *e.CallStack {
 		retCode = (e.RetCode_ERR_CACHE_DEL)
 		st.ErrRet = &e.AppError{Err: err, Code: retCode, ErrPoint: e.GetErrPoint(1)}
 	}
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheDel, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return st
@@ -132,7 +142,7 @@ func RedisLPush(conn redis.Conn, k string, v string) (st *e.CallStack) {
 		retCode = e.RetCode_ERR_CACHE_LPUSH
 		st.ErrRet = &e.AppError{Err: err, Code: retCode, ErrPoint: e.GetErrPoint(1)}
 	}
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheLPush, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return
@@ -156,7 +166,7 @@ func RedisMSet(conn redis.Conn, ks []string, datas []string, timeout int64) (st 
 		retCode = e.RetCode_ERR_CACHE_MSET
 		st.ErrRet = &e.AppError{Err: err, Code: retCode, ErrPoint: e.GetErrPoint(1)}
 	}
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheMSet, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return
@@ -187,7 +197,7 @@ func RedisMGet(conn redis.Conn, ks []string, timeout int64) ([]string, *e.CallSt
 		retCode = e.RetCode_ERR_TYPE_ASSERT
 	}
 RedisMGetStat:
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheGet, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return rs, st
@@ -220,7 +230,7 @@ func RedisGet(conn redis.Conn, k string, pValue interface{}, timeout int64) (boo
 			}
 		}
 	}
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheGet, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	if retCode != 0 {
@@ -246,7 +256,7 @@ func RedisSet(conn redis.Conn, k string, pValue interface{}, timeout int64) *e.C
 		}
 	}
 	srcAddr := net.ParseIP(strings.Split(conn.GetConn().RemoteAddr().String(), ":")[0])
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheSet, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return st
@@ -270,7 +280,7 @@ func RedisSetEx(conn redis.Conn, k string, pValue interface{}, expire int, timeo
 		}
 	}
 	srcAddr := net.ParseIP(strings.Split(conn.GetConn().RemoteAddr().String(), ":")[0])
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheSete, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return st
@@ -297,7 +307,7 @@ func RedisTTL(conn redis.Conn, k string, timeout int64) (int64, *e.CallStack) {
 
 	}
 	srcAddr := net.ParseIP(strings.Split(conn.GetConn().RemoteAddr().String(), ":")[0])
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheTTL, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 	return timeLeft, st
@@ -325,7 +335,7 @@ func RedisMSetEx(conn redis.Conn, ks []string, datas []string, expire int, timeo
 	}
 
 RedisMSetExStat:
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCacheTTL, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 
@@ -350,7 +360,7 @@ func RedisPublish(conn redis.Conn, channel, pValue interface{}, timeout int64) *
 		retCode = e.RetCode_ERR_CACHE_PUB
 	}
 redisPubStat:
-	if OpenStat {
+	if openStat {
 		stat.PushStat(StatCachePublish, int(time.Now().Sub(t1).Seconds()*1000), srcAddr, 0, int(retCode))
 	}
 
