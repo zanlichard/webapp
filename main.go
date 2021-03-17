@@ -38,7 +38,7 @@ func initLogger() {
 
 func initEnv() {
 	//初始化配置系统
-	apptoml.Init()
+	apptoml.Init("")
 
 	apperrors.Init(AppName)
 
@@ -70,7 +70,6 @@ func initStat() {
 	stat.Init(*logconfig, time.Duration(apptoml.Config.Server.Stat.Interval))
 	stat.SetDelayUp(50, 100, 200)
 	stat.Proc()
-
 }
 
 func exitStat() {
@@ -82,7 +81,37 @@ func releaseDB() {
 }
 
 //从配置管理中心获取服务的自身配置和依赖的外部服务的配置
-func initServiceDependence() bool {
+func initServiceDependence() error {
+	configFile := "./etc/dependence.xml"
+	err := apptoml.ServiceDepInit(configFile)
+	if err != nil {
+		return err
+	}
+	defer apptoml.ServiceDepFree()
+
+	m := make(map[string]appframework.AclDependentItem)
+
+	for _, service := range apptoml.Config.ConfigMng.DepServiceList {
+		logger.Logger.Info("service:%s", service)
+		url := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Url", service)
+		id := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Id", service)
+		name := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Name", service)
+		key := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Key", service)
+
+		serviceUrl := apptoml.ServiceDepGetField(url)
+		serviceId := apptoml.ServiceDepGetField(id)
+		serviceName := apptoml.ServiceDepGetField(name)
+		serviceKey := apptoml.ServiceDepGetField(key)
+		acl := appframework.AclDependentItem{
+			ServiceName: serviceName,
+			ServiceId:   serviceId,
+			ServiceKey:  serviceKey,
+			ServiceAlg:  "md5",
+			ServiceUrl:  serviceUrl,
+		}
+		m[serviceName] = acl
+	}
+	appframework.ServicenameDependenceMap = m
 	acl := appframework.LocalAcl{
 		LocalServiceId:     "2160037",
 		CheckAlgorithm:     "md5",
@@ -92,19 +121,13 @@ func initServiceDependence() bool {
 		CheckSignField:     "HSB-OPENAPI-SIGNATURE",
 		CheckSignData:      []string{"_head", "_param"},
 	}
+
 	appframework.LocalServiceCfg = acl
-	/*
-		err := json.Unmarshal([]byte(localcfg), &appframework.LocalServiceCfg)
-		if err != nil {
-			logger.Logger.Error("Load service config failed for:%+v", err)
-			return false
-		}
-	*/
 	localServiceId := "2160037"
 	id2name := make(map[string]string)
 	id2name[localServiceId] = AppName
 	appframework.ServiceIdDependenceMap = id2name
-	return true
+	return nil
 
 }
 
@@ -118,7 +141,8 @@ func main() {
 	defer exitStat()
 
 	//加载服务依赖
-	if !initServiceDependence() {
+	if err1 := initServiceDependence(); err1 != nil {
+		logger.Logger.Error("init service cfg err:%+v", err1.Error())
 		return
 	}
 

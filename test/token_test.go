@@ -1,9 +1,11 @@
-package main
+package test
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+	"testing"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -75,4 +77,12 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 		return claims, nil
 	}
 	return nil, TokenInvalid
+}
+func TestToken(t *testing.T) {
+	token, err := NewJWT().CreateToken(1000009, "15532", 30*24*3600)
+	if err != nil {
+		t.Logf("createtoken err: %+v\n", err)
+		return
+	}
+	t.Logf("token ==%+v", token)
 }

@@ -2,13 +2,8 @@ package apptoml
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/BurntSushi/toml"
-)
-
-var (
-	configFile = os.Getenv("CONFIG") //"./config.toml"
 )
 
 var (
@@ -107,10 +102,11 @@ type (
 
 	cfgCenter struct {
 		MasterServerList []string `toml:"masterAddrList"`
+		DepServiceList   []string `toml:"dependServices"`
 	}
 )
 
-func Init() {
+func Init(configFile string) {
 	if configFile == "" {
 		configFile = "./etc/config.toml"
 	}

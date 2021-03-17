@@ -7,6 +7,7 @@ import (
 	"webapp/middleware"
 	"webapp/router/admin"
 	v1 "webapp/router/api/v1"
+	"webapp/router/resmgr"
 	"webapp/stat"
 
 	"github.com/gin-contrib/pprof"
@@ -18,9 +19,12 @@ func initStat() {
 	stat.GStat.AddReportBodyRowItem(v1.StatGetAppVersion)
 	stat.GStat.AddReportBodyRowItem(admin.StatGetBasicCfg)
 	stat.GStat.AddReportBodyRowItem(admin.StatGetDependentCfg)
+	stat.GStat.AddReportBodyRowItem(admin.StatGetLocalAcl)
+
 	stat.GStat.AddReportErrorItem(v1.StatGetAppVersion)
 	stat.GStat.AddReportErrorItem(admin.StatGetBasicCfg)
 	stat.GStat.AddReportErrorItem(admin.StatGetDependentCfg)
+	stat.GStat.AddReportErrorItem(admin.StatGetLocalAcl)
 }
 
 func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
@@ -47,6 +51,12 @@ func InitRouter(accessInfoLogger, accessErrLogger io.Writer) *gin.Engine {
 		apiAdmin.POST("/get-basic-cfg", admin.GetBasicConfig)
 		apiAdmin.POST("/get-dep-cfg", admin.GetDependentConfig)
 		apiAdmin.POST("/set-basic-cfg", admin.SetBasicConfig)
+		apiAdmin.POST("/get-local-acl", admin.GetLocalAclConfig)
+	}
+
+	apiResMng := r.Group("/resourcemgr")
+	{
+		apiResMng.POST("/heartbeat", resmgr.Heartbeat)
 	}
 	apiG := r.Group("/api")
 	r.Use(middleware.CheckCallSign())

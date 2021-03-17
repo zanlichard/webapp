@@ -1,6 +1,7 @@
 package appinterface
 
 import (
+	"webapp/appframework"
 	"webapp/toolkit"
 
 	"github.com/zanlichard/beegoe/validation"
@@ -87,12 +88,19 @@ type DepCfgGetReq struct {
 	ServiceName   string `form:"service_name"`                     //服务名
 }
 
-type ServiceItem struct {
-	ServiceName string `json:"service_name"`
-	ServiceId   string `json:"service_id"`
-	ServiceKey  string `json:"service_key"`
+func (t *DepCfgGetReq) Valid(v *validation.Validation) {
+	if !t.IsServicesAll {
+		if t.ServiceName == "" {
+			v.SetError("service_name", "参数不全")
+		}
+
+	}
 }
 
 type DepCfgGetRsp struct {
-	Services []ServiceItem `json:"services"`
+	Services []appframework.AclDependentItem `json:"services"`
+}
+
+type LocalAclRsp struct {
+	LocalCfg appframework.LocalAcl `json:"local_config"`
 }

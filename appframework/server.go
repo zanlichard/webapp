@@ -45,6 +45,7 @@ type AclDependentItem struct {
 	ServiceId   string `json:"service_id"`
 	ServiceKey  string `json:"service_key"`
 	ServiceAlg  string `json:"service_sign_algorithm"`
+	ServiceUrl  string `json:"service_url"`
 }
 
 //依赖的外部服务的配置记录集

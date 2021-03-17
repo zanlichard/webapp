@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"time"
@@ -18,6 +19,7 @@ import (
 const (
 	StatGetBasicCfg     = "GetBasicCfg"
 	StatGetDependentCfg = "GetDepCfg"
+	StatGetLocalAcl     = "GetLocalAcl"
 )
 
 func GetBasicConfig(c *gin.Context) {
@@ -58,6 +60,13 @@ func GetBasicConfig(c *gin.Context) {
 		result.Hosts = []string{apptoml.Config.RabbitMq.ServerAddr}
 		result.Other = "{\"queuename\":apptoml.Config.RabbitMq.Queuename,\"vhost\":apptoml.Config.RabbitMq.Vhost}"
 
+	case "mongo":
+		result.UserName = apptoml.Config.Mongodb.Username
+		result.Passwd = apptoml.Config.Mongodb.Password
+		result.Database = apptoml.Config.Mongodb.DB
+		host := fmt.Sprintf("%s:%d", apptoml.Config.Mongodb.Server, apptoml.Config.Mongodb.Port)
+		result.Hosts = []string{host}
+
 	default:
 		result.UserName = ""
 		result.Passwd = ""
@@ -68,6 +77,18 @@ func GetBasicConfig(c *gin.Context) {
 	}
 	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
 	go stat.PushStat(StatGetBasicCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
+}
+
+func GetLocalAclConfig(c *gin.Context) {
+	appframework.BusinessLogger.Infof(c, "content-type:%s", c.Request.Header.Get("Content-Type"))
+	t1 := time.Now()
+	ipSrc := net.ParseIP(c.Request.RemoteAddr)
+	payload := int(c.Request.ContentLength)
+	var result appinterface.LocalAclRsp
+	result.LocalCfg = appframework.LocalServiceCfg
+	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
+	go stat.PushStat(StatGetLocalAcl, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
+
 }
 
 func GetDependentConfig(c *gin.Context) {
@@ -85,17 +106,14 @@ func GetDependentConfig(c *gin.Context) {
 		return
 	}
 	var result appinterface.DepCfgGetRsp
-	item := appinterface.ServiceItem{
-		apptoml.Config.Server.ServiceName,
-		"2160034",
-		"jjjjfdsafdafdasf dsafds",
+	for _, item := range appframework.ServicenameDependenceMap {
+		result.Services = append(result.Services, item)
 	}
-	result.Services = append(result.Services, item)
 	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
 	go stat.PushStat(StatGetDependentCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 
 }
 
 func SetBasicConfig(c *gin.Context) {
-
+	return
 }

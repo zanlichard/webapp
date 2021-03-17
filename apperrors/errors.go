@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"time"
+	"webapp/toolkit"
 )
 
 type (
@@ -92,7 +92,7 @@ func RegisterError(errMap map[RetCode]string) {
 func BeginCallStack(tag string) *CallStack {
 	s := new(CallStack)
 	s.Tag = tag
-	s.BeginTime = GetMSTimeStamp()
+	s.BeginTime = toolkit.GetMSTimeStamp()
 	return s
 }
 
@@ -136,7 +136,7 @@ func (s *CallStack) EndCall(skip int) *CallStack {
 
 	shortFileName, shortFuncName := shortFileFuncName(file, funcName)
 
-	s.ProcTime = GetMSTimeStamp() - s.BeginTime
+	s.ProcTime = toolkit.GetMSTimeStamp() - s.BeginTime
 	s.desc = fmt.Sprintf("%s:%s.%s:%d", shortFileName, shortFuncName, s.Tag, s.ProcTime)
 	return s
 }
@@ -273,10 +273,6 @@ func (cs *CallStack) GetProcMsg(funcTimeout int64) string {
 	b, _ := json.Marshal(csw)
 
 	return string(b)
-}
-
-func GetMSTimeStamp() int64 {
-	return time.Now().UTC().UnixNano() / int64(time.Millisecond)
 }
 
 func CheckError(cs *CallStack) bool {
