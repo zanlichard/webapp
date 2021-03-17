@@ -39,7 +39,6 @@ func CheckCallSign() gin.HandlerFunc {
 
 		body, _ := ioutil.ReadAll(c.Request.Body)
 		reqData := string(body)
-		appframework.BusinessLogger.Infof(c, "body:%s", reqData)
 		localSign := toolkit.ApiSign(reqData, appframework.LocalServiceCfg.CheckSignKey)
 		if localSign != Sign {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, "")

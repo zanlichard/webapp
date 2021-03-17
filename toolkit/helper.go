@@ -71,6 +71,11 @@ func ConvertToString(value interface{}) string {
 		return fmt.Sprintf("%d", v)
 	case string:
 		return v
+	case float32:
+	case float64:
+		return fmt.Sprintf("%f", v)
+	default:
+		return ""
 	}
 
 	return ""
