@@ -73,8 +73,8 @@ func CloseLogger() {
 }
 
 /*
-  提前格式化,保留少部分的数据交给日志库去控制
-  将日志的级别、进程ID、协程ID也放置到本级打印
+  ?????,????????????????
+  ?????????ID???ID????????
 
 */
 func getLogHost() string {
@@ -125,7 +125,7 @@ func InfoFormat(format string, v ...interface{}) {
 	dateStr := GetLogDatePrefix()
 	ProcId := os.Getpid()
 	ThreadId := toolkit.ConvertToString(GetGoroutineID())
-	LogLevel := "ERROR"
+	LogLevel := "INFO"
 	IpAddr := getLogHost()
 	logData := fmt.Sprintf("%s|%s|%s|%s|%d|%s|%s|%s|%s|%d|%s", dateStr, LogLevel, ThreadId, ThreadId, ProcId, IpAddr, webappName, fileName, funcName, lineNo, appLog)
 	Logger.Info("%s", logData)
@@ -142,7 +142,7 @@ func DebugFormat(format string, v ...interface{}) {
 	dateStr := GetLogDatePrefix()
 	ProcId := os.Getpid()
 	ThreadId := toolkit.ConvertToString(GetGoroutineID())
-	LogLevel := "ERROR"
+	LogLevel := "DEBUG"
 	IpAddr := getLogHost()
 	logData := fmt.Sprintf("%s|%s|%s|%s|%d|%s|%s|%s|%s|%d|%s", dateStr, LogLevel, ThreadId, ThreadId, ProcId, IpAddr, webappName, fileName, funcName, lineNo, appLog)
 	Logger.Debug("%s", logData)
