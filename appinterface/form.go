@@ -2,21 +2,17 @@ package appinterface
 
 import (
 	"webapp/appframework"
+	"webapp/subsys"
 	"webapp/toolkit"
 
 	"github.com/zanlichard/beegoe/validation"
 )
 
-//基本协议头定义
-type ReqHeader struct {
-	CallServiceId string `json:"_callerServiceId"`
-	GroupNo       string `json:"_groupNo"`
-	Interface     string `json:"_interface"`
-	InvokeId      string `json:"_invokeId"`
-	MsgType       string `json:"_msgType"`
-	Remark        string `json:"_remark"`
-	Timestamp     string `json:"_timestamps"`
-	Version       string `json:"_version"`
+//通用返回
+type HttpCommonRsp struct {
+	Code int         `json:"code"`
+	Data interface{} `json:"data"`
+	Msg  string      `json:"msg"`
 }
 
 //检查APP版本请求定义
@@ -42,9 +38,9 @@ type ParamInfo struct {
 }
 
 //基本请求体定义
-type ReqBody struct {
-	Head  ReqHeader `json:"_head"`
-	Param ParamInfo `json:"_param"` //上层应用定义
+type AppVerCheckMsg struct {
+	Head  subsys.SubsysHeader `json:"_head"`
+	Param ParamInfo           `json:"_param"` //上层应用定义
 }
 
 func (t *AppVersionCheckReq) Valid(v *validation.Validation) {

@@ -31,7 +31,7 @@ func GetBasicConfig(c *gin.Context) {
 	err := app.BindAndValid(c, &form)
 	appframework.BusinessLogger.Infof(c, "req body:%+v", form)
 	if err != nil {
-		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, err.Error())
+		app.JsonResponsev2(c, http.StatusBadRequest, code.INVALID_PARAMS, err.Error())
 		appframework.ErrorLogger.Errorf(c, "GetBasicCfg form: %+v, err: %+v", form, err)
 		go stat.PushStat(StatGetBasicCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
 		return
@@ -75,7 +75,7 @@ func GetBasicConfig(c *gin.Context) {
 		result.MaxIdleConns = 0
 		result.IdleTimeout = 0
 	}
-	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
+	app.JsonResponsev2(c, http.StatusOK, code.SUCCESS, result)
 	go stat.PushStat(StatGetBasicCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 }
 
@@ -86,7 +86,7 @@ func GetLocalAclConfig(c *gin.Context) {
 	payload := int(c.Request.ContentLength)
 	var result appinterface.LocalAclRsp
 	result.LocalCfg = appframework.LocalServiceCfg
-	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
+	app.JsonResponsev2(c, http.StatusOK, code.SUCCESS, result)
 	go stat.PushStat(StatGetLocalAcl, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 
 }
@@ -100,7 +100,7 @@ func GetDependentConfig(c *gin.Context) {
 	err := app.BindAndValid(c, &form)
 	appframework.BusinessLogger.Infof(c, "req body:%+v", form)
 	if err != nil {
-		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, err.Error())
+		app.JsonResponsev2(c, http.StatusBadRequest, code.INVALID_PARAMS, err.Error())
 		appframework.ErrorLogger.Errorf(c, "GetDepCfg form: %+v, err: %+v", form, err)
 		go stat.PushStat(StatGetDependentCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
 		return
@@ -109,7 +109,7 @@ func GetDependentConfig(c *gin.Context) {
 	for _, item := range appframework.ServicenameDependenceMap {
 		result.Services = append(result.Services, item)
 	}
-	app.JsonResponse(c, http.StatusOK, code.SUCCESS, result)
+	app.JsonResponsev2(c, http.StatusOK, code.SUCCESS, result)
 	go stat.PushStat(StatGetDependentCfg, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(e.RetCode_SUCCESS))
 
 }

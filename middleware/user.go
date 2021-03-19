@@ -14,18 +14,18 @@ func CheckUserToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("token")
 		if token == "" {
-			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_TOKEN_EMPTY, "")
+			app.JsonResponsev2(c, http.StatusUnauthorized, code.ERROR_TOKEN_EMPTY, "")
 			c.Abort()
 			return
 		}
 		claims, err := auth.ParseToken(token)
 		if err != nil {
-			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_TOKEN_INVALID, "")
+			app.JsonResponsev2(c, http.StatusUnauthorized, code.ERROR_TOKEN_INVALID, "")
 			c.Abort()
 			return
 		}
 		if claims == nil || claims.UID == 0 {
-			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_TOKEN_INVALID, "")
+			app.JsonResponsev2(c, http.StatusUnauthorized, code.ERROR_TOKEN_INVALID, "")
 			c.Abort()
 			return
 		}

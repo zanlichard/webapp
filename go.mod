@@ -20,7 +20,7 @@ require (
 	github.com/shirou/gopsutil v2.20.7+incompatible // indirect
 	github.com/shopspring/decimal v1.2.0
 	github.com/streadway/amqp v1.0.0
-	github.com/zanlichard/beegoe v1.0.1
+	github.com/zanlichard/beegoe v1.0.2
 	github.com/zanlichard/redisgoe v1.0.2
 	go.elastic.co/apm v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974

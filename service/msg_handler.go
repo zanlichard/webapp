@@ -13,7 +13,7 @@ func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppV
 	//取最新的1条记录
 	result, err := dao.GetAppVersionRecord(sessionId, req.ClientType)
 	if err != nil {
-		Logger.Error("session:%s GetAppVersion failed for:%+v", sessionId, err)
+		ErrorFormat("session:%s GetAppVersion failed for:%+v", sessionId, err)
 		return nil, e.RetCode_ERR_DB_SERVER
 	}
 	rsp := new(appinterface.AppVersionCheckRsp)
@@ -25,6 +25,6 @@ func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppV
 	rsp.Title = result.Title
 	rsp.VersionName = rsp.Title
 
-	Logger.Error("session:%s rsp:%+v ", sessionId, rsp)
+	DebugFormat("session:%s rsp:%+v ", sessionId, rsp)
 	return rsp, e.RetCode_SUCCESS
 }

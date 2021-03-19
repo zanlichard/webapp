@@ -12,12 +12,13 @@ import (
 )
 
 type SubsysCommonRsp struct {
-	Code int         `json:"code"`
-	Data interface{} `json:"data"`
-	Msg  string      `json:"msg"`
+	Msg     string      `json:"_errStr"`
+	Data    interface{} `json:"_data"` //上层应用定义
+	RetCode string      `json:"_errCode"`
+	Ret     string      `json:"_ret"`
 }
 
-type SubsysReqHeader struct {
+type SubsysHeader struct {
 	CallServiceId string `json:"_callerServiceId"`
 	GroupNo       string `json:"_groupNo"`
 	Interface     string `json:"_interface"`
@@ -30,20 +31,39 @@ type SubsysReqHeader struct {
 
 //基本请求体定义
 type SubsysReqBody struct {
-	Head  SubsysReqHeader `json:"_head"`
-	Param interface{}     `json:"_param"` //上层应用定义
+	Head  SubsysHeader `json:"_head"`
+	Param interface{}  `json:"_param"` //上层应用定义
 }
 
-func SubsysReqSerialize(serviceDomain string, callerServiceId string, functionName string, sessionId string, callerSignKey string, reqType string, reqRemark string, reqVersion string, msgBody interface{}) (*http.Request, error) {
+//基本响应体定义
+type SubsysRspBody struct {
+	Head SubsysHeader    `json:"_head"`
+	Rsp  SubsysCommonRsp `json:"_data"`
+}
+
+func SubsysGetBadHeader() SubsysHeader {
+	return SubsysHeader{
+		CallServiceId: "unknown",
+		GroupNo:       "-1",
+		Interface:     "unknown",
+		InvokeId:      "unknown",
+		MsgType:       "response",
+		Remark:        "unknown",
+		Timestamp:     toolkit.ConvertToString(toolkit.GetTimeStamp()),
+		Version:       "unknown",
+	}
+}
+
+func SubsysReqSerialize(serviceDomain string, callerServiceId string, funcName string, sessionId string, signKey string, reqType string, reqRemark string, reqVersion string, msgBody interface{}) (*http.Request, error) {
 	timestamp := fmt.Sprintf("%d", toolkit.GetTimeStamp())
-	head := SubsysReqHeader{
+	head := SubsysHeader{
 		CallServiceId: callerServiceId,
 		GroupNo:       "1",
-		Interface:     functionName,
+		Interface:     funcName,
 		InvokeId:      sessionId,
 		MsgType:       reqType,
 		Remark:        reqRemark,
-		Timestamp:     timestamp,
+		Timestamp:     toolkit.ConvertToString(timestamp),
 		Version:       reqVersion,
 	}
 	request := SubsysReqBody{
@@ -54,8 +74,8 @@ func SubsysReqSerialize(serviceDomain string, callerServiceId string, functionNa
 	if err0 != nil {
 		return nil, err0
 	}
-	signStr := toolkit.ApiSign(jsonStr, callerSignKey)
-	reqUrl := serviceDomain + "/" + functionName
+	signStr := toolkit.ApiSign(jsonStr, signKey)
+	reqUrl := serviceDomain + "/" + funcName
 	req, err := http.NewRequest("POST", reqUrl, strings.NewReader(jsonStr))
 	if err != nil {
 		return nil, err
@@ -66,7 +86,7 @@ func SubsysReqSerialize(serviceDomain string, callerServiceId string, functionNa
 	return req, nil
 }
 
-func SubsysRequest(req *http.Request) (*SubsysCommonRsp, error) {
+func SubsysRequest(req *http.Request) (*SubsysRspBody, error) {
 	client := &http.Client{}
 	rsp, err := client.Do(req)
 	if err != nil {
@@ -80,7 +100,7 @@ func SubsysRequest(req *http.Request) (*SubsysCommonRsp, error) {
 	if err != nil {
 		return nil, err
 	}
-	var obj SubsysCommonRsp
+	var obj SubsysRspBody
 	err = json.Unmarshal(string(body), &obj)
 	if err != nil {
 		return nil, err

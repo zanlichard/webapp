@@ -15,7 +15,7 @@ var (
 
 func RunApplication(application *appframework.WEBApplication) {
 	if application.Name == "" {
-		Logger.Error("Application name can't not be empty")
+		ErrorFormat("Application name can't not be empty")
 	}
 
 	application.EndPort = apptoml.Config.Server.EndPort
@@ -25,7 +25,7 @@ func RunApplication(application *appframework.WEBApplication) {
 
 	err := runApp(application)
 	if err != nil {
-		Logger.Error("App.RunListenerApplication err: %v", err)
+		ErrorFormat("App.RunListenerApplication err: %v", err)
 	}
 	App = application
 }
@@ -52,10 +52,10 @@ func runApp(webApp *appframework.WEBApplication) error {
 	//3.  setup server monitor in single goroutine
 	go func() {
 		addr := "0.0.0.0:" + strconv.Itoa(webApp.MonitorEndPort)
-		Logger.Info("App run monitor server addr: %v", addr)
+		InfoFormat("App run monitor server addr: %v", addr)
 		err := http.ListenAndServe(addr, webApp.Mux)
 		if err != nil {
-			Logger.Error("App run monitor server err: %v", err)
+			ErrorFormat("App run monitor server err: %v", err)
 		}
 	}()
 
@@ -82,7 +82,7 @@ func runApp(webApp *appframework.WEBApplication) error {
 
 	// 7. run http server
 	if webApp.RegisterHttpRoute == nil {
-		Logger.Error("App RegisterHttpRoute nil ??")
+		ErrorFormat("App RegisterHttpRoute nil ??")
 	}
 	// 8. register and gin framework startup
 	err = webApp.RegisterHttpRoute().Run(addr)

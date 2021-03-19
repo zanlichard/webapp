@@ -7,26 +7,22 @@ import (
 	"strings"
 	"testing"
 	"webapp/appinterface"
+	"webapp/subsys"
 	"webapp/toolkit"
 
 	"gitee.com/cristiane/go-common/json"
 )
 
 const (
-	baseUrlDev   = "http://192.168.163.128:51001"
+	baseUrlDev   = "http://192.168.37.131:51001"
 	baseUrlLocal = "http://localhost:51001"
 )
 const (
-	appVersionCheck = "/api/v1/app/check-version"
-	getbasicCfg     = "/admin/get-basic-cfg"
-	getdepCfg       = "/admin/get-dep-cfg"
-	getlocalCfg     = "/admin/get-local-acl"
-)
-
-const (
-	SuccessBusinessCode = 0
-	serviceId           = "2160034"
-	serviceKey          = "h6F2GvOm1Q1pR5ATYbMjUIUyscLiBs3E"
+	appVersionCheck  = "/api/v1/app/check-version"
+	versionCheckPath = "/api/v1/app"
+	getbasicCfg      = "/admin/get-basic-cfg"
+	getdepCfg        = "/admin/get-dep-cfg"
+	getlocalCfg      = "/admin/get-local-acl"
 )
 
 type HttpCommonRsp struct {
@@ -34,6 +30,12 @@ type HttpCommonRsp struct {
 	Data interface{} `json:"data"`
 	Msg  string      `json:"msg"`
 }
+
+const (
+	SuccessBusinessCode = 0
+	serviceId           = "2160034"
+	serviceKey          = "h6F2GvOm1Q1pR5ATYbMjUIUyscLiBs3E"
+)
 
 func TestRune(t *testing.T) {
 	var i int = 122
@@ -86,6 +88,7 @@ func TestGetDepCfg(t *testing.T) {
 		return
 	}
 }
+
 func TestGetBasicCfg(t *testing.T) {
 	request := appinterface.BasicCfgGetReq{
 		"mongo",
@@ -171,7 +174,7 @@ func TestGetLocalAclCfg(t *testing.T) {
 }
 
 func TestAppVersionCheck(t *testing.T) {
-	head := appinterface.ReqHeader{
+	head := subsys.SubsysHeader{
 		CallServiceId: serviceId,
 		GroupNo:       "1",
 		Interface:     "check_app_version",
@@ -188,7 +191,7 @@ func TestAppVersionCheck(t *testing.T) {
 	param := appinterface.ParamInfo{
 		ApiRequest: appverCheck,
 	}
-	request := appinterface.ReqBody{
+	request := appinterface.AppVerCheckMsg{
 		Head:  head,
 		Param: param,
 	}
@@ -242,8 +245,53 @@ func TestAppVersionCheck(t *testing.T) {
 	}
 }
 
+func TestAppVersionCheckv2(t *testing.T) {
+	appverCheck := appinterface.AppVersionCheckReq{
+		ClientType:     1,
+		CurrentVersion: "100001",
+	}
+	param := appinterface.ParamInfo{
+		ApiRequest: appverCheck,
+	}
+	functionName := "check-version"
+	_, sessionId, err1 := toolkit.GetUniqId(functionName)
+	if err1 != nil {
+		t.Errorf("get session id failed for:%+v", err1)
+		return
+	}
+	reqver := "0.0.1"
+
+	reqUrl := baseUrlDev + versionCheckPath
+	req, err := subsys.SubsysReqSerialize(reqUrl, serviceId, functionName, sessionId, serviceKey, "request", "test", reqver, param)
+	if err != nil {
+		t.Errorf("generate req failed for:%+v", err)
+		return
+	}
+	rsp, err2 := subsys.SubsysRequest(req)
+	if err2 != nil {
+		t.Errorf("request failed for:%+v", err2)
+		return
+	}
+	t.Logf("response:%+v", rsp)
+
+	tmpJson, err3 := json.Marshal(rsp.Rsp.Data)
+	if err3 != nil {
+		t.Errorf("data format failed:%+v", err3)
+		return
+	}
+
+	appverCheckRsp := appinterface.AppVersionCheckRsp{}
+	if err4 := json.Unmarshal(string(tmpJson), &appverCheckRsp); err4 != nil {
+		t.Errorf("data format failed:%+v", err4)
+		return
+	}
+	t.Logf("response:%+v", appverCheckRsp)
+
+}
+
 //基本接口
 func Testwebapp(t *testing.T) {
 	t.Run("APP版本获取", TestAppVersionCheck)
 	t.Run("获取基本配置", TestGetBasicCfg)
+	t.Run("APP版本获取v2", TestAppVersionCheckv2)
 }

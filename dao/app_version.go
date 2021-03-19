@@ -15,7 +15,7 @@ func GetAppVersionRecord(session string, clientType int8) (*mysql.AppVersion, er
 	if err != nil {
 		return nil, err
 	}
-	Logger.Info("session:%s record:%+v", session, versionRecord)
+	InfoFormat("session:%s record:%+v", session, versionRecord)
 	return &versionRecord, nil
 
 }

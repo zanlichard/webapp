@@ -31,7 +31,7 @@ func initLogger() {
 			apptoml.Config.Server.Log.LogDir, apptoml.Config.Server.Log.LogFile)
 		config := logger.NewConfig(filename,
 			apptoml.Config.Server.Log.MaxLines, apptoml.Config.Server.Log.MaxSize, apptoml.Config.Server.Log.MaxDays)
-		logger.Logger = logger.NewLogger("file",
+		logger.Logger = logger.NewLogger(AppName, "file",
 			apptoml.Config.Server.Log.LogLevel, config, apptoml.Config.Server.Log.ChanLen)
 	}
 }
@@ -92,7 +92,7 @@ func initServiceDependence() error {
 	m := make(map[string]appframework.AclDependentItem)
 
 	for _, service := range apptoml.Config.ConfigMng.DepServiceList {
-		logger.Logger.Info("service:%s", service)
+		logger.InfoFormat("service:%s", service)
 		url := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Url", service)
 		id := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Id", service)
 		name := fmt.Sprintf("/DEPENDENTSERVERINFO/%s/Name", service)
@@ -142,7 +142,7 @@ func main() {
 
 	//加载服务依赖
 	if err1 := initServiceDependence(); err1 != nil {
-		logger.Logger.Error("init service cfg err:%+v", err1.Error())
+		logger.ErrorFormat("init service cfg err:%+v", err1.Error())
 		return
 	}
 
@@ -157,7 +157,7 @@ func main() {
 	debug := apptoml.Config.Server.Debug
 	err := storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime, debug)
 	if err != nil {
-		logger.Logger.Error("init database err:%+v", err.Error())
+		logger.ErrorFormat("init database err:%+v", err.Error())
 		return
 	}
 	defer releaseDB()
