@@ -10,6 +10,7 @@ import (
 	"webapp/frame/appframework"
 	"webapp/frame/appframework/app"
 	"webapp/frame/appframework/code"
+	"webapp/frame/trace"
 	"webapp/stat"
 	"webapp/toolkit"
 
@@ -21,6 +22,7 @@ const (
 )
 
 func CheckAppVersionApi(c *gin.Context) {
+	defer trace.Recovery()
 	appframework.BusinessLogger.Infof(c, "content-type:%s", c.Request.Header.Get("Content-Type"))
 	t1 := time.Now()
 	var form appinterface.AppVerCheckMsg

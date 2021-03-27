@@ -11,9 +11,12 @@ import (
 )
 
 var (
-	LocalServiceCfg          LocalAcl
-	ServicenameDependenceMap map[string]AclDependentItem //servicename as the key
-	ServiceIdDependenceMap   map[string]string           //serviceId map to serviceName
+	LocalServiceCfg      LocalAcl
+	DependenceServiceMap map[string]AclDependentItem //servicename as the key
+	AclServiceMap        map[string]AclDependentItem
+
+	DependenceServiceId2Nam map[string]string //dependence serviceId map to serviceName
+	AclServiceId2Name       map[string]string //acl  serviceId map to serviceName
 )
 
 //访问控制配置选项
@@ -50,6 +53,7 @@ func InitServiceDependence(serviceName string, dependenceServices []string) erro
 	}
 	defer xml.XmlFree()
 	m := make(map[string]AclDependentItem)
+	id2Name := make(map[string]string)
 
 	for _, service := range dependenceServices {
 		logger.InfoFormat("service:%s", service)
@@ -70,26 +74,65 @@ func InitServiceDependence(serviceName string, dependenceServices []string) erro
 			ServiceUrl:  serviceUrl,
 		}
 		m[serviceName] = acl
+		id2Name[serviceId] = service
 	}
-	ServicenameDependenceMap = m
-	//id2name := make(map[string]string)
-	//ServiceIdDependenceMap = id2name
+
+	DependenceServiceMap = m
+	DependenceServiceId2Nam = id2Name
 	return nil
 
 }
 
 //初始化本地访问控制
-func initServiceLocalCfg() {
+func InitServiceLocalCfg(aclService []string) error {
+	configFile := "./etc/localacl.xml"
+	err := xml.XmlInit(configFile)
+	if err != nil {
+		return err
+	}
+	defer xml.XmlFree()
+	m := make(map[string]AclDependentItem)
+	id2Name := make(map[string]string)
+	allowServiceIds := []string{}
+	for _, service := range aclService {
+		logger.InfoFormat("allow access service:%s", service)
+		id := fmt.Sprintf("/ACL/%s/Id", service)
+		key := fmt.Sprintf("/ACL/%s/Key", service)
+		serviceId := xml.XmlGetField(id)
+		serviceKey := xml.XmlGetField(key)
+		acl := AclDependentItem{
+			ServiceName: service,
+			ServiceId:   serviceId,
+			ServiceKey:  serviceKey,
+			ServiceAlg:  "md5",
+		}
+		m[service] = acl
+		id2Name[serviceId] = service
+		allowServiceIds = append(allowServiceIds, serviceId)
+	}
+	AclServiceMap = m
+	AclServiceId2Name = id2Name
+
+	localServiceId := xml.XmlGetField("/ACL/Local/Id")
+	signMethod := xml.XmlGetField("/ACL/Local/SignMethod")
+	checkIdField := xml.XmlGetField("/ACL/Local/CheckIdField")
+	checkSignField := xml.XmlGetField("/ACL/Local/CheckSignField")
+	checkSignData := []string{}
+	xml.XmlGetMultiField("/ACL/Local/SignFields/SignField", &checkSignData)
 	acl := LocalAcl{
-		LocalServiceId:     "2160037",
-		CheckAlgorithm:     "md5",
-		CheckSignKey:       "h6F2GvOm1Q1pR5ATYbMjUIUyscLiBs3E",
-		AllowServiceIdList: []string{"2120013", "2160034"},
-		CheckIdField:       "HSB-OPENAPI-CALLERSERVICEID",
-		CheckSignField:     "HSB-OPENAPI-SIGNATURE",
-		CheckSignData:      []string{"_head", "_param"},
+		LocalServiceId:     localServiceId,
+		CheckAlgorithm:     signMethod,
+		AllowServiceIdList: allowServiceIds,
+		CheckIdField:       checkIdField,
+		CheckSignField:     checkSignField,
+		CheckSignData:      checkSignData,
 	}
 	LocalServiceCfg = acl
+
+	logger.InfoFormat("acl service map:%+v", m)
+	logger.InfoFormat("acl serviceId2Name map:%+v", id2Name)
+	logger.InfoFormat("local service config:%+v", acl)
+	return nil
 }
 func InitApplication(app *WEBApplication, appName string, isDebug bool, endPoint int, monitorEndPoint int, logPath string, logLevel string) {
 	app.EndPort = endPoint
@@ -99,7 +142,6 @@ func InitApplication(app *WEBApplication, appName string, isDebug bool, endPoint
 	app.LoggerLevel = logLevel
 	app.Name = appName
 	app.IsDebug = isDebug
-	initServiceLocalCfg()
 	return
 }
 
@@ -129,8 +171,6 @@ func runApp(webApp *WEBApplication) error {
 		logger.ErrorFormat("InitGlobalConfig:%+v", err)
 		return err
 	}
-	return nil
-
 	// 2. setup vars
 	err = setupWEBVars(webApp)
 	if err != nil {
@@ -178,7 +218,6 @@ func runApp(webApp *WEBApplication) error {
 	}
 	// 8. register and gin framework startup
 	err = webApp.RegisterHttpRoute(webApp.IsDebug).Run(addr)
-
 	return err
 }
 

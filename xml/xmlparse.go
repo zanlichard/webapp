@@ -38,3 +38,12 @@ func XmlGetField(accessPath string) string {
 	}
 	return ""
 }
+
+func XmlGetMultiField(accessPath string, slice *[]string) {
+	if path := xmlpath.MustCompile(accessPath); path != nil {
+		it := path.Iter(root)
+		for it.Next() {
+			*slice = append(*slice, it.Node().String())
+		}
+	}
+}

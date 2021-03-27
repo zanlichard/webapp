@@ -7,10 +7,10 @@ import (
 	"webapp/application/appconfig"
 	"webapp/application/apperrors"
 	"webapp/application/router"
+	"webapp/application/storage"
 	"webapp/frame/appframework"
 	"webapp/logger"
 	"webapp/stat"
-	"webapp/storage"
 )
 
 var (
@@ -69,6 +69,7 @@ func RegisterHttpRoute(isDebug bool) *gin.Engine {
 	accessInfoLogger := &appframework.AccessInfoLogger{}
 	accessErrLogger := &appframework.AccessErrLogger{}
 	ginRouter := router.InitRouter(accessInfoLogger, accessErrLogger, isDebug)
+	logger.InfoFormat("init router begin")
 	return ginRouter
 }
 
@@ -79,11 +80,23 @@ func InitAppInstance(serviceName string) bool {
 	apperrors.Init(serviceName)
 	//初始化日志系统
 	initLogger(serviceName)
+	//初始化本地监控
+	initStat()
+
+	//初始化数据库
+	initDB()
+
 	//加载服务依赖
-	if err1 := appframework.InitServiceDependence(serviceName, appconfig.Config.ConfigMng.DepServiceList); err1 != nil {
-		logger.ErrorFormat("init service cfg err:%+v", err1.Error())
+	if err := appframework.InitServiceDependence(serviceName, appconfig.Config.ConfigMng.DepServiceList); err != nil {
+		logger.ErrorFormat("init service dependence cfg err:%+v", err.Error())
 		return false
 	}
+	//加载本地访问访问规则
+	if err := appframework.InitServiceLocalCfg(appconfig.Config.ConfigMng.AclServiceList); err != nil {
+		logger.ErrorFormat("init service local acl cfg err:%+v", err.Error())
+		return false
+	}
+
 	//框架初始化
 	App = &appframework.WEBApplication{
 		Application: &appframework.Application{

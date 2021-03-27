@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"syscall"
 	"webapp/appengine"
-	"webapp/application/appconfig"
 )
 
 const (
@@ -29,17 +28,18 @@ func signHandler() {
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
 		syscall.SIGUSR1,
+
 		syscall.SIGUSR2)
 	go func() {
 		for s := range c {
 			switch s {
 			case syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+				fmt.Printf("recv signal:%+v", s)
 				appengine.ExitAppInstance()
 				os.Exit(-1)
 			case syscall.SIGUSR1:
 			case syscall.SIGUSR2:
 				fmt.Println("reload config")
-				appconfig.ReInit("")
 			default:
 				fmt.Printf("other signal:%+v", s)
 			}
@@ -66,6 +66,8 @@ func main() {
 
 	//应用实例启动
 	defer appengine.ExitAppInstance()
+
+	fmt.Println("begin to start appInstance")
 	appengine.StartAppInstance()
 
 }

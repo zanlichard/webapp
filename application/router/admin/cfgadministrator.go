@@ -11,6 +11,7 @@ import (
 	"webapp/frame/appframework"
 	"webapp/frame/appframework/app"
 	"webapp/frame/appframework/code"
+	"webapp/frame/trace"
 	"webapp/stat"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,7 @@ const (
 )
 
 func GetBasicConfig(c *gin.Context) {
+	defer trace.Recovery()
 	appframework.BusinessLogger.Infof(c, "content-type:%s", c.Request.Header.Get("Content-Type"))
 	t1 := time.Now()
 	var form appinterface.BasicCfgGetReq
@@ -80,6 +82,7 @@ func GetBasicConfig(c *gin.Context) {
 }
 
 func GetLocalAclConfig(c *gin.Context) {
+	defer trace.Recovery()
 	appframework.BusinessLogger.Infof(c, "content-type:%s", c.Request.Header.Get("Content-Type"))
 	t1 := time.Now()
 	ipSrc := net.ParseIP(c.Request.RemoteAddr)
@@ -92,6 +95,7 @@ func GetLocalAclConfig(c *gin.Context) {
 }
 
 func GetDependentConfig(c *gin.Context) {
+	defer trace.Recovery()
 	appframework.BusinessLogger.Infof(c, "content-type:%s", c.Request.Header.Get("Content-Type"))
 	t1 := time.Now()
 	var form appinterface.DepCfgGetReq
@@ -106,7 +110,7 @@ func GetDependentConfig(c *gin.Context) {
 		return
 	}
 	var result appinterface.DepCfgGetRsp
-	for _, item := range appframework.ServicenameDependenceMap {
+	for _, item := range appframework.DependenceServiceMap {
 		result.Services = append(result.Services, item)
 	}
 	app.JsonResponsev2(c, http.StatusOK, code.SUCCESS, result)
@@ -115,5 +119,6 @@ func GetDependentConfig(c *gin.Context) {
 }
 
 func SetBasicConfig(c *gin.Context) {
+	defer trace.Recovery()
 	return
 }

@@ -54,7 +54,9 @@ func CheckCallSign() gin.HandlerFunc {
 		}
 
 		reqData := string(body)
-		localSign := toolkit.ApiSign(reqData, appframework.LocalServiceCfg.CheckSignKey)
+		serviceName := appframework.AclServiceId2Name[callServiceId]
+		aclItem := appframework.AclServiceMap[serviceName]
+		localSign := toolkit.ApiSign(reqData, aclItem.ServiceKey)
 		if localSign != Sign {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, rspHead, nil)
 			appframework.ErrorLogger.Errorf(c, "request sign:%s local sign:%s", Sign, localSign)

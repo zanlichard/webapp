@@ -2,8 +2,8 @@ package dao
 
 import (
 	"webapp/application/dao/model/mysql"
+	"webapp/application/storage"
 	. "webapp/logger"
-	"webapp/storage"
 )
 
 /*
