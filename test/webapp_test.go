@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"webapp/appinterface"
-	"webapp/subsys"
+	"webapp/application/appinterface"
+	"webapp/frame/subsys"
 	"webapp/toolkit"
 
 	"gitee.com/cristiane/go-common/json"

@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 	"time"
-	e "webapp/apperrors"
+	e "webapp/application/apperrors"
 	"webapp/stat"
 
 	"github.com/zanlichard/redisgoe/redis"
