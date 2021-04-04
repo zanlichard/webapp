@@ -29,7 +29,7 @@ func GetImageInfo(c *gin.Context) {
 	payload := int(c.Request.ContentLength)
 	_, sessId, err := toolkit.GetUniqId(StatGetAppVersion)
 	if err != nil {
-		appframework.ErrorLogger.Infof(c, "generate session id failed for:%+v", err)
+		appframework.BusinessLogger.Infof(c, "generate session id failed for:%+v", err)
 	}
 	err = app.BindOnly(c, &form)
 	rspHeader := form.Head
@@ -37,29 +37,22 @@ func GetImageInfo(c *gin.Context) {
 	rspHeader.Timestamp = toolkit.ConvertToString(toolkit.GetTimeStamp())
 	if err != nil {
 		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, rspHeader, nil)
-		appframework.ErrorLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
+		appframework.BusinessLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
 		go stat.PushStat(StatGetImage, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
 		return
 	}
+	appframework.BusinessLogger.Infof(c, "req:%+v", form)
 	err = app.ValidOnly(c, form.Param)
 	appframework.BusinessLogger.Infof(c, "session:%s req body:%+v", sessId, form)
 	if err != nil {
 		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, rspHeader, nil)
-		appframework.ErrorLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
+		appframework.BusinessLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
 		go stat.PushStat(StatGetImage, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
 		return
 	}
-	req, ok := (form.Param).(appinterface.GetImageReq)
-	if !ok {
-		app.JsonResponse(c, http.StatusBadRequest, code.INVALID_PARAMS, rspHeader, nil)
-		appframework.ErrorLogger.Errorf(c, "session:%s GetImageInfo form: %+v param invalid", sessId, form)
-		go stat.PushStat(StatGetImage, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(code.INVALID_PARAMS))
-		return
-	}
-
-	result, retCode := service.GetImageInfo(c, sessId, &req)
+	result, retCode := service.GetImageInfo(c, sessId, &form.Param)
 	if retCode != e.RetCode_SUCCESS {
-		appframework.ErrorLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
+		appframework.BusinessLogger.Errorf(c, "session:%s GetImageInfo form: %+v, err: %+v", sessId, form, err)
 		app.JsonResponse(c, http.StatusOK, int(retCode), rspHeader, nil)
 		go stat.PushStat(StatGetImage, int(time.Now().Sub(t1).Seconds()*1000), ipSrc, payload, int(retCode))
 		return

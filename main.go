@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"syscall"
 	"webapp/appengine"
+	"webapp/logger"
 )
 
 const (
@@ -60,15 +61,15 @@ func main() {
 	//运行环境初始化
 	initEnv()
 
+	defer appengine.ExitAppInstance()
 	//应用实例初始化
 	if !appengine.InitAppInstance(AppName) {
-		panic("init application instance failed")
+		fmt.Printf("%s init application instance failed", logger.GetLogDatePrefix())
+		return
 	}
 
 	//应用实例启动
-	defer appengine.ExitAppInstance()
-
-	fmt.Println("begin to start appInstance")
+	fmt.Printf("%s begin to start appInstance", logger.GetLogDatePrefix())
 	appengine.StartAppInstance()
 
 }

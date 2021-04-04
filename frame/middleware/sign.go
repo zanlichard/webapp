@@ -22,7 +22,7 @@ func CheckCallSign() gin.HandlerFunc {
 		err := json.Unmarshal(body, &reqMsg)
 		if err != nil {
 			app.JsonResponse(c, http.StatusBadRequest, code.ERRO_SERVICE_ID_FIELD_NO_EXIST, subsys.SubsysGetBadHeader(), nil)
-			appframework.ErrorLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
+			appframework.BusinessLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
 			c.Abort()
 			return
 		}
@@ -34,21 +34,21 @@ func CheckCallSign() gin.HandlerFunc {
 		callServiceId := c.Request.Header.Get(appframework.LocalServiceCfg.CheckIdField)
 		if callServiceId == "" {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERRO_SERVICE_ID_FIELD_NO_EXIST, rspHead, nil)
-			appframework.ErrorLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
+			appframework.BusinessLogger.Errorf(c, "get headerfield:%s failed", appframework.LocalServiceCfg.CheckIdField)
 			c.Abort()
 			return
 		}
 		Sign := c.Request.Header.Get(appframework.LocalServiceCfg.CheckSignField)
 		if Sign == "" {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_SIGN_FIELD_NO_EXIST, rspHead, nil)
-			appframework.ErrorLogger.Errorf(c, "get header field:%s failed", appframework.LocalServiceCfg.CheckSignField)
+			appframework.BusinessLogger.Errorf(c, "get header field:%s failed", appframework.LocalServiceCfg.CheckSignField)
 			c.Abort()
 			return
 		}
 		bIsAllow := toolkit.ArrayCheckIn(callServiceId, appframework.LocalServiceCfg.AllowServiceIdList)
 		if !bIsAllow {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, rspHead, nil)
-			appframework.ErrorLogger.Errorf(c, "get header field:%s failed", strings.Join(appframework.LocalServiceCfg.AllowServiceIdList, ", "))
+			appframework.BusinessLogger.Errorf(c, "get header field:%s failed", strings.Join(appframework.LocalServiceCfg.AllowServiceIdList, ", "))
 			c.Abort()
 			return
 		}
@@ -59,7 +59,7 @@ func CheckCallSign() gin.HandlerFunc {
 		localSign := toolkit.ApiSign(reqData, aclItem.ServiceKey)
 		if localSign != Sign {
 			app.JsonResponse(c, http.StatusUnauthorized, code.ERROR_DENY_SERVICE_ID, rspHead, nil)
-			appframework.ErrorLogger.Errorf(c, "request sign:%s local sign:%s", Sign, localSign)
+			appframework.BusinessLogger.Errorf(c, "request sign:%s local sign:%s", Sign, localSign)
 			c.Abort()
 			return
 		}

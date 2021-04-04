@@ -111,6 +111,10 @@ func TestMongoUpdate(t *testing.T) {
 	fi := &Image{}
 	fi.UserID = int32(fileUid)
 	fi.FileStatus = 1 //更新状态
+	fi.FileMd5 = toolkit.Md5Digest("test0001")
+	fi.FileKey = "test0001"
+	fi.FileSize = 33000
+	fi.FileURL = "http://github.com/zanlichard/master/blob/docs/SystemDesign.png"
 
 	selector := &bson.M{"_id": fi.UserID}
 	count, err := mgoSession.DB(tDatabase).C(tTable).Find(selector).Count()

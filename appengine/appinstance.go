@@ -37,7 +37,7 @@ func initStat() {
 	logConfig.Maxfilesize = appconfig.Config.Server.Stat.MaxFileSize
 	logConfig.Maxdays = appconfig.Config.Server.Stat.MaxDays
 	logConfig.Maxlines = appconfig.Config.Server.Stat.MaxLines
-	fmt.Printf("level:%s path:%s NamePrefix:%s filename:%s interval:%d\n",
+	logger.InfoFormat("level:%s path:%s NamePrefix:%s filename:%s interval:%d",
 		appconfig.Config.Server.Stat.LogLevel,
 		appconfig.Config.Server.Stat.LogPath,
 		appconfig.Config.Server.Stat.NamePrefix,
@@ -50,7 +50,7 @@ func initStat() {
 
 func initMongo() bool {
 	mongoHost := fmt.Sprintf("%s:%d", appconfig.Config.Mongodb.Server, appconfig.Config.Mongodb.Port)
-	err := storage.InitMgo(mongoHost, appconfig.Config.Mongodb.DB, appconfig.Config.Mongodb.Username, appconfig.Config.Mongodb.Password, 20, true)
+	err := storage.InitMgo(mongoHost, appconfig.Config.Mongodb.DB, appconfig.Config.Mongodb.Username, appconfig.Config.Mongodb.Password, 20, false)
 	if err != nil {
 		logger.ErrorFormat("init mongo failed for:%+v ", err)
 		return false
@@ -97,28 +97,31 @@ func InitAppInstance(serviceName string) bool {
 	initLogger(serviceName)
 	//初始化本地监控
 	initStat()
-
+	logger.InfoFormat("init stat finish")
 	//初始化数据库
 	if !initDB() {
 		logger.ErrorFormat("init database failed")
 		return false
 	}
+	logger.InfoFormat("init database finish")
+	//初始化mongodb
 	if !initMongo() {
 		logger.ErrorFormat("init mongodb failed")
 		return false
 	}
-
+	logger.InfoFormat("init mongodb finish")
 	//加载服务依赖
 	if err := appframework.InitServiceDependence(serviceName, appconfig.Config.ConfigMng.DepServiceList); err != nil {
 		logger.ErrorFormat("init service dependence cfg err:%+v", err.Error())
 		return false
 	}
+	logger.InfoFormat("init service dependence finish")
 	//加载本地访问访问规则
 	if err := appframework.InitServiceLocalCfg(appconfig.Config.ConfigMng.AclServiceList); err != nil {
 		logger.ErrorFormat("init service local acl cfg err:%+v", err.Error())
 		return false
 	}
-
+	logger.InfoFormat("init local acl finish")
 	//框架初始化
 	App = &appframework.WEBApplication{
 		Application: &appframework.Application{

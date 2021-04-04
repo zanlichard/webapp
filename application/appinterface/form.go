@@ -44,21 +44,16 @@ type AppVersionCheckRsp struct {
 	Remark      string `json:"remark"`       // 备注
 }
 
-//业务请求嵌套定义
-type ParamInfo struct {
-	ApiRequest AppVersionCheckReq `valid:"Required" json:"clientinfo"`
-}
-
 //基本请求体定义
 type AppVerCheckMsg struct {
 	Head  subsys.SubsysHeader `json:"_head"`
-	Param ParamInfo           `json:"_param"` //上层应用定义
+	Param AppVersionCheckReq  `json:"_param"` //上层应用定义
 }
 
 //基本请求体定义
 type GetImageMsg struct {
 	Head  subsys.SubsysHeader `json:"_head"`
-	Param interface{}         `json:"_param"` //上层应用定义
+	Param GetImageReq         `json:"_param"` //上层应用定义
 }
 
 func (t *AppVersionCheckReq) Valid(v *validation.Validation) {

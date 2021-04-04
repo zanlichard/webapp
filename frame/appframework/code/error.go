@@ -9,6 +9,7 @@ const (
 	ERROR_TOKEN_INVALID            = 4003
 	ERROR_TOKEN_EXPIRE             = 4004
 	ERROR_USER_NOT_EXIST           = 4005
+	ERROR_BAD_REQUEST              = 4006
 	ERROR                          = 500
 	ERROR_DATA_NOT_EXIST           = 5001
 	ERROR_CONFIG_PARSE             = 5003

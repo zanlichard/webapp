@@ -125,11 +125,6 @@ func Init(configFile string) {
 	}
 
 	if _, err := toml.DecodeFile(configFile, &Config); err != nil {
-		panic(fmt.Sprintf("load server config err:%s", err.Error()))
+		panic(fmt.Sprintf("%s load server config err:%s", logger.GetLogDatePrefix, err.Error()))
 	}
-	fmt.Printf("level:%s path:%s NamePrefix:%s filename:%s interval:%d\n", Config.Server.Stat.LogLevel,
-		Config.Server.Stat.LogPath,
-		Config.Server.Stat.NamePrefix,
-		Config.Server.Stat.Filename,
-		Config.Server.Stat.Interval)
 }
