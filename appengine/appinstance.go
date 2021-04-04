@@ -48,7 +48,17 @@ func initStat() {
 	stat.Proc()
 }
 
-func initDB() {
+func initMongo() bool {
+	mongoHost := fmt.Sprintf("%s:%d", appconfig.Config.Mongodb.Server, appconfig.Config.Mongodb.Port)
+	err := storage.InitMgo(mongoHost, appconfig.Config.Mongodb.DB, appconfig.Config.Mongodb.Username, appconfig.Config.Mongodb.Password, 20, true)
+	if err != nil {
+		logger.ErrorFormat("init mongo failed for:%+v ", err)
+		return false
+	}
+	return true
+}
+
+func initDB() bool {
 	//存储初始化
 	serverAddr := appconfig.Config.Database.Mysql.ServerAddr
 	user := appconfig.Config.Database.Mysql.User
@@ -61,8 +71,9 @@ func initDB() {
 	err := storage.InitDB(serverAddr, user, pwd, dbase, maxOpen, maxIdle, idleTime, debug)
 	if err != nil {
 		logger.ErrorFormat("init database err:%+v", err.Error())
-		return
+		return false
 	}
+	return true
 }
 
 func RegisterHttpRoute(isDebug bool) *gin.Engine {
@@ -71,6 +82,10 @@ func RegisterHttpRoute(isDebug bool) *gin.Engine {
 	ginRouter := router.InitRouter(accessInfoLogger, accessErrLogger, isDebug)
 	logger.InfoFormat("init router begin")
 	return ginRouter
+}
+
+func ReLoad(serviceName string) {
+
 }
 
 func InitAppInstance(serviceName string) bool {
@@ -84,7 +99,14 @@ func InitAppInstance(serviceName string) bool {
 	initStat()
 
 	//初始化数据库
-	initDB()
+	if !initDB() {
+		logger.ErrorFormat("init database failed")
+		return false
+	}
+	if !initMongo() {
+		logger.ErrorFormat("init mongodb failed")
+		return false
+	}
 
 	//加载服务依赖
 	if err := appframework.InitServiceDependence(serviceName, appconfig.Config.ConfigMng.DepServiceList); err != nil {

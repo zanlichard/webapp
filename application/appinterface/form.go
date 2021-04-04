@@ -21,6 +21,18 @@ type AppVersionCheckReq struct {
 	CurrentVersion string `valid:"Required" json:"current_ver"` //客户端端类型(1:ios,2:android,3:web)
 }
 
+type GetImageReq struct {
+	FileKey  string `valid:"Required" json:"file_key"`  //文件key
+	FileMd5  string `valid:"Required" json:"file_md5"`  //文件md5
+	FileSize int32  `valid:"Required" json:"file_size"` //文件大小
+}
+
+type GetImageRsp struct {
+	UserID  int32  `json:"uid"`
+	FileURL string `json:"file_url"`
+	AppID   int32  `json:"app_id"`
+}
+
 //检查APP版本响应定义
 type AppVersionCheckRsp struct {
 	BuildCode   string `json:"build_code"`   // 构建的代码
@@ -43,12 +55,24 @@ type AppVerCheckMsg struct {
 	Param ParamInfo           `json:"_param"` //上层应用定义
 }
 
+//基本请求体定义
+type GetImageMsg struct {
+	Head  subsys.SubsysHeader `json:"_head"`
+	Param interface{}         `json:"_param"` //上层应用定义
+}
+
 func (t *AppVersionCheckReq) Valid(v *validation.Validation) {
 	if t.ClientType != 1 && t.ClientType != 2 {
 		v.SetError("ClientType", "ClientType有效期取值只能为1,2")
 	}
 	if len(t.CurrentVersion) != 6 {
 		v.SetError("current_ver", "长度不合法")
+	}
+}
+
+func (t *GetImageReq) Valid(v *validation.Validation) {
+	if t.FileSize <= 0 {
+		v.SetError("FileSize", "文件大小不能小于等于0")
 	}
 
 }

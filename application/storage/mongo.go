@@ -4,9 +4,19 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"time"
+	"webapp/logger"
 )
 
 var mongo *mgo.Session
+var mgoDataBase string
+
+type MgoLogger struct {
+}
+
+func (log *MgoLogger) Output(calldepth int, s string) error {
+	logger.InfoFormat("cmd:%s", s)
+	return nil
+}
 
 // MgoSetMaxpool 设置最大池子
 func MgoSetMaxpool(maxpool int) error {
@@ -14,18 +24,30 @@ func MgoSetMaxpool(maxpool int) error {
 	return nil
 }
 
+func GetMongoDatabaseName() string {
+	return mgoDataBase
+}
+
 // InitMgo 初始化mongo
-func InitMgo(addr, database, account, passwd string, maxpoolsize int) (err error) {
+func InitMgo(addr, database, account, passwd string, maxpoolsize int, isDebug bool) (err error) {
 	mgoconf := fmt.Sprintf("mongodb://%s?maxPoolSize=%d", addr, maxpoolsize)
 	if account != "" {
 		mgoconf = fmt.Sprintf("mongodb://%s:%s@%s/%s?maxPoolSize=%d", account, passwd, addr, database, maxpoolsize)
 	}
+
+	mgoDataBase = database
 	mongo, err = mgo.Dial(mgoconf)
 	if err == nil {
 		mongo.SetMode(mgo.PrimaryPreferred, true)
+	} else {
+		return err
 	}
-
-	return err
+	if isDebug {
+		mgoLog := &MgoLogger{}
+		mgo.SetDebug(true)
+		mgo.SetLogger(mgoLog)
+	}
+	return nil
 }
 
 // InitMgoEx 初始化mongo

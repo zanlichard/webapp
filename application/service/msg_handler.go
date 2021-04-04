@@ -28,3 +28,20 @@ func GetAppVersion(ctx context.Context, sessionId string, req *appinterface.AppV
 	DebugFormat("session:%s rsp:%+v ", sessionId, rsp)
 	return rsp, e.RetCode_SUCCESS
 }
+
+func GetImageInfo(ctx context.Context, sessionId string, req *appinterface.GetImageReq) (*appinterface.GetImageRsp, e.RetCode) {
+	//取最新的1条记录
+	result, err := dao.GetImage(sessionId, req.FileSize, req.FileMd5, req.FileKey)
+	if err != nil {
+		ErrorFormat("session:%s GetImage failed for:%+v", sessionId, err)
+		return nil, e.RetCode_ERR_DB_SERVER
+	}
+	rsp := new(appinterface.GetImageRsp)
+
+	rsp.UserID = result.UserID
+	rsp.FileURL = result.FileURL
+	rsp.AppID = result.AppID
+
+	DebugFormat("session:%s rsp:%+v ", sessionId, rsp)
+	return rsp, e.RetCode_SUCCESS
+}

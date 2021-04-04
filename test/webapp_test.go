@@ -20,6 +20,7 @@ const (
 const (
 	appVersionCheck  = "/api/v1/app/check-version"
 	versionCheckPath = "/api/v1/app"
+	getImagePath     = "/api/v1/app"
 	getbasicCfg      = "/admin/get-basic-cfg"
 	getdepCfg        = "/admin/get-dep-cfg"
 	getlocalCfg      = "/admin/get-local-acl"
@@ -286,6 +287,54 @@ func TestAppVersionCheckv2(t *testing.T) {
 		return
 	}
 	t.Logf("response:%+v", appverCheckRsp)
+
+}
+
+func TestGetImage(t *testing.T) {
+
+	fileKey := "test0001"
+	fileMd5 := toolkit.Md5Digest(fileKey)
+	fileSize := 33000
+
+	getImageReq := appinterface.GetImageReq{
+		FileSize: int32(fileSize),
+		FileKey:  "100001",
+		FileMd5:  fileMd5,
+	}
+
+	functionName := "get-image"
+	_, sessionId, err1 := toolkit.GetUniqId(functionName)
+	if err1 != nil {
+		t.Errorf("get session id failed for:%+v", err1)
+		return
+	}
+	reqver := "0.0.1"
+
+	reqUrl := baseUrlDev + getImagePath
+	req, err := subsys.SubsysReqSerialize(reqUrl, serviceId, functionName, sessionId, serviceKey, "request", "test", reqver, getImageReq)
+	if err != nil {
+		t.Errorf("generate req failed for:%+v", err)
+		return
+	}
+	rsp, err2 := subsys.SubsysRequest(req)
+	if err2 != nil {
+		t.Errorf("request failed for:%+v", err2)
+		return
+	}
+	t.Logf("response:%+v", rsp)
+
+	tmpJson, err3 := json.Marshal(rsp.Rsp.Data)
+	if err3 != nil {
+		t.Errorf("data format failed:%+v", err3)
+		return
+	}
+
+	getImageRsp := appinterface.GetImageRsp{}
+	if err4 := json.Unmarshal(string(tmpJson), &getImageRsp); err4 != nil {
+		t.Errorf("data format failed:%+v", err4)
+		return
+	}
+	t.Logf("response:%+v", getImageRsp)
 
 }
 

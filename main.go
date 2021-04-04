@@ -40,6 +40,7 @@ func signHandler() {
 			case syscall.SIGUSR1:
 			case syscall.SIGUSR2:
 				fmt.Println("reload config")
+				appengine.ReLoad(AppName)
 			default:
 				fmt.Printf("other signal:%+v", s)
 			}

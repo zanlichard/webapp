@@ -35,9 +35,8 @@ func InitDB(serverAddr string, user string, pwd string, database string, maxOpen
 	GDb.DB().SetMaxIdleConns(maxIdle)
 	GDb.DB().SetConnMaxLifetime(time.Duration(idleTime) * time.Second)
 
-	sqlLog := &SqlLogger{}
-
 	if debug {
+		sqlLog := &SqlLogger{}
 		GDb.LogMode(true)
 		GDb.SetLogger(sqlLog)
 	}

@@ -29,7 +29,7 @@ var (
 )
 
 func TestMongoQuery(t *testing.T) {
-	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20)
+	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20, false)
 	if err != nil {
 		t.Errorf("init mongo failed for:%+v ", err)
 		return
@@ -58,7 +58,7 @@ func TestMongoQuery(t *testing.T) {
 }
 
 func TestMongoAdd(t *testing.T) {
-	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20)
+	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20, false)
 	if err != nil {
 		t.Errorf("init mongo failed for:%+v ", err)
 		return
@@ -94,7 +94,7 @@ func TestMongoAdd(t *testing.T) {
 }
 
 func TestMongoUpdate(t *testing.T) {
-	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20)
+	err := InitMgo(tHost, tDatabase, tMongoAccount, tMongoPassWord, 20, false)
 	if err != nil {
 		t.Errorf("init mongo failed for:%+v ", err)
 		return
